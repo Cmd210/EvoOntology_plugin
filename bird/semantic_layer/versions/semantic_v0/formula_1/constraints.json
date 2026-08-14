@@ -1,0 +1,37 @@
+[
+  {
+    "id": "cst_position_order",
+    "target": "term_f1_race_result",
+    "constraint_type": "enum_semantics",
+    "trigger_keywords": [
+      "position",
+      "rank",
+      "finish position",
+      "ranking"
+    ],
+    "severity": "warning",
+    "scope": "",
+    "confidence": "high",
+    "description": "results.position stores the displayed finish position (INTEGER for finishers, may be NULL for non-finishers). results.positionText stores the position as text (e.g. 'R' for retired). For numeric ordering use results.positionOrder.",
+    "evidence": [
+      "ev_results_schema"
+    ]
+  },
+  {
+    "id": "cst_participant_identifier",
+    "target": "term_f1_driver",
+    "constraint_type": "business_rule",
+    "trigger_keywords": [
+      "participant",
+      "identifier",
+      "participant code"
+    ],
+    "severity": "info",
+    "scope": "",
+    "confidence": "high",
+    "description": "Use the stable participant identifier for joins and grouping; descriptive attributes are not reliable join keys.",
+    "evidence": [
+      "ev_drivers_schema"
+    ]
+  }
+]

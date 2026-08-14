@@ -1,0 +1,34 @@
+[
+  {
+    "id": "ev_drivers_schema",
+    "source": "schema inspection",
+    "query": "Inspect the representative participant table.",
+    "result": "The table contains an identifier, a short code, descriptive attributes, and nationality metadata.",
+    "validation_method": "schema inspection",
+    "timestamp": ""
+  },
+  {
+    "id": "ev_drivers_sample",
+    "source": "value inspection",
+    "query": "Inspect a small sample of representative rows.",
+    "result": "Representative values were observed and then withheld from this anonymized example.",
+    "validation_method": "value observation",
+    "timestamp": ""
+  },
+  {
+    "id": "ev_races_schema",
+    "source": "schema inspection",
+    "query": "Inspect the representative event table.",
+    "result": "The table contains an event identifier, temporal fields, a venue reference, and descriptive metadata.",
+    "validation_method": "schema inspection",
+    "timestamp": ""
+  },
+  {
+    "id": "ev_results_schema",
+    "source": "schema inspection",
+    "query": "Inspect the representative outcome table.",
+    "result": "The table links participant and event identifiers and records ordinal outcomes and performance measures.",
+    "validation_method": "schema inspection",
+    "timestamp": ""
+  }
+]

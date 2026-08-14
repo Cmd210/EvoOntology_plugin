@@ -1,0 +1,59 @@
+[
+  {
+    "id": "mapping.ddr.revenue",
+    "term_id": "term.finance.revenue",
+    "database_source": "sqlite",
+    "table": "financial_facts",
+    "column": "fact_value",
+    "semantic_filter": "Revenues",
+    "aggregation_semantics": "Aggregate only at the analytical grain stated by the term.",
+    "grain": "company × fiscal period",
+    "validation": {
+      "description": "",
+      "data_type": "numeric",
+      "confidence": "high",
+      "evidence": [
+        "evidence.mapping.ddr.revenue"
+      ],
+      "term_scope": "ddr_bench / 10k / financial_analysis"
+    }
+  },
+  {
+    "id": "mapping.ddr.net_income",
+    "term_id": "term.finance.net_income",
+    "database_source": "sqlite",
+    "table": "financial_facts",
+    "column": "fact_value",
+    "semantic_filter": "NetIncomeLoss",
+    "aggregation_semantics": "Aggregate only at the analytical grain stated by the term.",
+    "grain": "company × fiscal period",
+    "validation": {
+      "description": "",
+      "data_type": "numeric",
+      "confidence": "high",
+      "evidence": [
+        "evidence.mapping.ddr.net_income"
+      ],
+      "term_scope": "ddr_bench / 10k / financial_analysis"
+    }
+  },
+  {
+    "id": "mapping.ddr.operating_income",
+    "term_id": "term.finance.operating_income",
+    "database_source": "sqlite",
+    "table": "financial_facts",
+    "column": "fact_value",
+    "semantic_filter": "OperatingIncomeLoss",
+    "aggregation_semantics": "Aggregate only at the analytical grain stated by the term.",
+    "grain": "company × fiscal period",
+    "validation": {
+      "description": "",
+      "data_type": "numeric",
+      "confidence": "high",
+      "evidence": [
+        "evidence.mapping.ddr.operating_income"
+      ],
+      "term_scope": "ddr_bench / 10k / financial_analysis"
+    }
+  }
+]

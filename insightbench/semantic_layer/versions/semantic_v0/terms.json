@@ -1,0 +1,61 @@
+[
+  {
+    "id": "term.core.duration",
+    "name": "Duration",
+    "type": "metric",
+    "definition": "Elapsed time between a compatible start timestamp and end timestamp. Duration can be computed from (opened_at→closed_at) in incident data or (start_date→end_date) in goal data. Some finance CSVs have pre-computed processing_time columns.",
+    "scope": "insight_bench / core",
+    "aliases": [
+      "processing time",
+      "resolution time",
+      "elapsed time",
+      "turnaround time",
+      "cycle time",
+      "lead time"
+    ],
+    "evidence": [
+      "evidence.term.core.duration"
+    ]
+  },
+  {
+    "id": "term.core.time",
+    "name": "Timestamp",
+    "type": "time",
+    "definition": "A point in time used for ordering, filtering, and aggregation. Train data contains 10 distinct time columns across 22 groups: opened_at, closed_at, sys_updated_on, processed_date, start_date, end_date, purchased_on.",
+    "scope": "insight_bench / core",
+    "aliases": [
+      "datetime",
+      "date",
+      "time point",
+      "moment",
+      "timestamp",
+      "when"
+    ],
+    "evidence": [
+      "evidence.term.core.time"
+    ]
+  },
+  {
+    "id": "term.core.entity",
+    "name": "Entity",
+    "type": "entity",
+    "definition": "A distinct identifiable record in the dataset. Each CSV row represents an entity: an incident ticket, a finance expense line, an asset record, a goal, or a system user. All main tables have 500 rows (entities).",
+    "scope": "insight_bench / core",
+    "aliases": [
+      "record",
+      "row",
+      "case",
+      "ticket",
+      "incident",
+      "entry",
+      "item",
+      "expense",
+      "asset",
+      "goal",
+      "user"
+    ],
+    "evidence": [
+      "evidence.term.core.entity"
+    ]
+  }
+]

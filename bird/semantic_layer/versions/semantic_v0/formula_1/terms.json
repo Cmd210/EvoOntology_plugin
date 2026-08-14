@@ -1,0 +1,58 @@
+[
+  {
+    "id": "term_f1_driver",
+    "name": "Driver",
+    "type": "entity",
+    "definition": "A participant record with an identifier, a short code, descriptive attributes, and category metadata.",
+    "scope": "",
+    "aliases": [
+      "driver",
+      "drivers",
+      "racer",
+      "racing driver",
+      "F1 driver",
+      "driver id",
+      "driver code",
+      "driver number",
+      "driver reference"
+    ],
+    "evidence": [
+      "ev_drivers_sample",
+      "ev_drivers_schema"
+    ]
+  },
+  {
+    "id": "term_f1_race",
+    "name": "Race",
+    "type": "entity",
+    "definition": "A Formula 1 Grand Prix race event with name, year, round, date, and circuit",
+    "scope": "",
+    "aliases": [
+      "grand prix",
+      "race event",
+      "race name",
+      "race year",
+      "race date"
+    ],
+    "evidence": [
+      "ev_races_schema"
+    ]
+  },
+  {
+    "id": "term_f1_race_result",
+    "name": "Race Result",
+    "type": "concept",
+    "definition": "A participant outcome in a specific event, including ordinal position and performance measures.",
+    "scope": "",
+    "aliases": [
+      "finish position",
+      "race points",
+      "finish time",
+      "laps completed",
+      "race outcome"
+    ],
+    "evidence": [
+      "ev_results_schema"
+    ]
+  }
+]

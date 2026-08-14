@@ -1,0 +1,59 @@
+[
+  {
+    "id": "mapping.core.time.opened_at.1",
+    "term_id": "term.core.time",
+    "database_source": "insight_csv",
+    "table": "main",
+    "column": "opened_at",
+    "semantic_filter": "",
+    "aggregation_semantics": "Aggregate only at the analytical grain stated by the term.",
+    "grain": "entity",
+    "validation": {
+      "description": "",
+      "data_type": "datetime",
+      "confidence": "high",
+      "evidence": [
+        "evidence.mapping.core.time.opened_at"
+      ],
+      "term_scope": "insight_bench / core"
+    }
+  },
+  {
+    "id": "mapping.core.time.opened_at.2",
+    "term_id": "term.core.time",
+    "database_source": "insight_csv",
+    "table": "main",
+    "column": "open_time",
+    "semantic_filter": "",
+    "aggregation_semantics": "Aggregate only at the analytical grain stated by the term.",
+    "grain": "entity",
+    "validation": {
+      "description": "",
+      "data_type": "datetime",
+      "confidence": "high",
+      "evidence": [
+        "evidence.mapping.core.time.opened_at"
+      ],
+      "term_scope": "insight_bench / core"
+    }
+  },
+  {
+    "id": "mapping.core.time.opened_at.3",
+    "term_id": "term.core.time",
+    "database_source": "insight_csv",
+    "table": "main",
+    "column": "created_at",
+    "semantic_filter": "",
+    "aggregation_semantics": "Aggregate only at the analytical grain stated by the term.",
+    "grain": "entity",
+    "validation": {
+      "description": "",
+      "data_type": "datetime",
+      "confidence": "high",
+      "evidence": [
+        "evidence.mapping.core.time.opened_at"
+      ],
+      "term_scope": "insight_bench / core"
+    }
+  }
+]

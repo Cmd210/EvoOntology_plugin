@@ -1,0 +1,43 @@
+[
+  {
+    "id": "constraint.core.duration_validity",
+    "target": "term.core.duration",
+    "constraint_type": "data_quality",
+    "trigger_keywords": [
+      "duration",
+      "elapsed",
+      "processing",
+      "resolution",
+      "time to",
+      "cycle time"
+    ],
+    "severity": "warning",
+    "scope": "insight_bench / core",
+    "confidence": "high",
+    "description": "Parse timestamps, handle missing end times, and investigate negative durations before aggregation. Train data contains pre-computed processing_time_hours with negative values (min=-7150 hours in one group). Parse both timestamps, exclude or label incomplete records, and check for negative durations.",
+    "evidence": [
+      "evidence.constraint.core.duration_validity"
+    ]
+  },
+  {
+    "id": "constraint.core.join_validation",
+    "target": "term.core.entity",
+    "constraint_type": "business_rule",
+    "trigger_keywords": [
+      "join",
+      "merge",
+      "lookup",
+      "combine",
+      "user table",
+      "sys_user",
+      "auxiliary"
+    ],
+    "severity": "warning",
+    "scope": "insight_bench / core",
+    "confidence": "high",
+    "description": "Check key coverage and cardinality before merging tables to avoid row multiplication and biased aggregates. Train data has 5 join patterns; coverage varies from 0.5 to 1.0. Check join-key coverage, duplicate keys, and row counts before and after the merge.",
+    "evidence": [
+      "evidence.constraint.core.join_validation"
+    ]
+  }
+]

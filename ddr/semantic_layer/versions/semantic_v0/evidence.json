@@ -1,0 +1,50 @@
+[
+  {
+    "id": "evidence.term.finance.revenue",
+    "source": "bootstrap_agent",
+    "query": "Inspect workload references and probe the corresponding data fields: q_0003, q_0004",
+    "result": "Question-driven dimensions=['revenue_and_mix']; matched_questions=72; train_company_coverage=42/50; observed_units=['USD']",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.term.finance.net_income",
+    "source": "bootstrap_agent",
+    "query": "Inspect workload references and probe the corresponding data fields: q_0005, q_0006",
+    "result": "Question-driven dimensions=['profitability_and_margin']; matched_questions=51; train_company_coverage=49/50; observed_units=['USD']",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.term.finance.operating_income",
+    "source": "bootstrap_agent",
+    "query": "Inspect workload references and probe the corresponding data fields: q_0007, q_0008",
+    "result": "Question-driven dimensions=['profitability_and_margin']; matched_questions=51; train_company_coverage=42/50; observed_units=['USD']",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.mapping.ddr.revenue",
+    "source": "bootstrap_agent",
+    "query": "Inspect workload references and probe the corresponding data fields: q_0003, q_0004",
+    "result": "Question-driven dimensions=['revenue_and_mix']; matched_questions=72; train_company_coverage=42/50; observed_units=['USD']",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.mapping.ddr.net_income",
+    "source": "bootstrap_agent",
+    "query": "Inspect workload references and probe the corresponding data fields: q_0005, q_0006",
+    "result": "Question-driven dimensions=['profitability_and_margin']; matched_questions=51; train_company_coverage=49/50; observed_units=['USD']",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.mapping.ddr.operating_income",
+    "source": "bootstrap_agent",
+    "query": "Inspect workload references and probe the corresponding data fields: q_0007, q_0008",
+    "result": "Question-driven dimensions=['profitability_and_margin']; matched_questions=51; train_company_coverage=42/50; observed_units=['USD']",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  }
+]

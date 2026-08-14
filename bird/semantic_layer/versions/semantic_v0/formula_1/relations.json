@@ -1,0 +1,27 @@
+[
+  {
+    "id": "rel_driver_result",
+    "source": "term_f1_driver",
+    "relation_type": "association",
+    "target": "term_f1_race_result",
+    "connection_condition": "drivers.driverId = results.driverId",
+    "description": "A participant is linked to an event outcome record.",
+    "evidence": [
+      "ev_drivers_sample",
+      "ev_drivers_schema",
+      "ev_results_schema"
+    ]
+  },
+  {
+    "id": "rel_race_result",
+    "source": "term_f1_race",
+    "relation_type": "association",
+    "target": "term_f1_race_result",
+    "connection_condition": "races.raceId = results.raceId",
+    "description": "An event contains multiple participant outcome records.",
+    "evidence": [
+      "ev_races_schema",
+      "ev_results_schema"
+    ]
+  }
+]

@@ -1,0 +1,51 @@
+[
+  {
+    "id": "map_driver_identity",
+    "term_id": "term_f1_driver",
+    "database_source": "",
+    "table": "drivers",
+    "column": "",
+    "semantic_filter": "",
+    "aggregation_semantics": "",
+    "grain": "per driver",
+    "validation": {
+      "description": "",
+      "evidence": [
+        "ev_drivers_schema",
+        "ev_drivers_sample"
+      ]
+    }
+  },
+  {
+    "id": "map_race_info",
+    "term_id": "term_f1_race",
+    "database_source": "",
+    "table": "races",
+    "column": "",
+    "semantic_filter": "",
+    "aggregation_semantics": "",
+    "grain": "per race",
+    "validation": {
+      "description": "",
+      "evidence": [
+        "ev_races_schema"
+      ]
+    }
+  },
+  {
+    "id": "map_result_position",
+    "term_id": "term_f1_race_result",
+    "database_source": "",
+    "table": "results",
+    "column": "position",
+    "semantic_filter": "",
+    "aggregation_semantics": "",
+    "grain": "per driver per race",
+    "validation": {
+      "description": "",
+      "evidence": [
+        "ev_results_schema"
+      ]
+    }
+  }
+]

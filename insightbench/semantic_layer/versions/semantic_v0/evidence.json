@@ -1,0 +1,66 @@
+[
+  {
+    "id": "evidence.term.core.duration",
+    "source": "schema_inference",
+    "query": "Inspect workload references and probe the corresponding data fields: column:opened_at, column:closed_at, column:start_date, column:end_date, column:processing_time",
+    "result": "Duration pairs (opened_at↔closed_at, start_date↔end_date) found in 10 train groups across incident and goal domains. Pre-computed processing_time columns also exist in finance CSVs.",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.term.core.time",
+    "source": "schema_inference",
+    "query": "Inspect workload references and probe the corresponding data fields: column:user.start_date, column:main.sys_updated_on, column:main.purchased_on, column:main.end_date, column:main.start_date, column:main.opened_at, column:main.closed_at, column:main.processed_date, column:main.processed_time, column:main.processing_time_hours",
+    "result": "Time columns are pervasive: 22/25 train groups contain at least one time-role column. No group is entirely without timestamps.",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.term.core.entity",
+    "source": "manual",
+    "query": "Inspect workload references and probe the corresponding data fields: tceo_core_module, train_inventory:all_tables_row_count=500",
+    "result": "Every data table represents a collection of entities. All train groups have at least one main table with 500 entity rows.",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.relation.core.duration_inputs",
+    "source": "manual",
+    "query": "Inspect workload references and probe the corresponding data fields: tceo_core_module",
+    "result": "Core relation 'relation.core.duration_inputs' is fundamental to data analysis and applies across all 25 train groups.",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.relation.core.entity_has_time",
+    "source": "manual",
+    "query": "Inspect workload references and probe the corresponding data fields: tceo_core_module",
+    "result": "Core relation 'relation.core.entity_has_time' is fundamental to data analysis and applies across all 25 train groups.",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.mapping.core.time.opened_at",
+    "source": "schema_inference",
+    "query": "Inspect workload references and probe the corresponding data fields: column:main.opened_at",
+    "result": "Open/Creation Timestamp Mapping: Maps open/creation timestamp columns to core Time concept. 19 groups have opened_at — the most common time column. (5 train groups).",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.constraint.core.duration_validity",
+    "source": "manual",
+    "query": "Inspect workload references and probe the corresponding data fields: tceo_core_module, train_inventory:n_train_groups=25",
+    "result": "Core constraint 'constraint.core.duration_validity' applies across all domains. Evidence from 25 train groups.",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  },
+  {
+    "id": "evidence.constraint.core.join_validation",
+    "source": "manual",
+    "query": "Inspect workload references and probe the corresponding data fields: tceo_core_module, train_inventory:n_train_groups=25",
+    "result": "Core constraint 'constraint.core.join_validation' applies across all domains. Evidence from 25 train groups.",
+    "validation_method": "workload-guided schema and value verification",
+    "timestamp": ""
+  }
+]

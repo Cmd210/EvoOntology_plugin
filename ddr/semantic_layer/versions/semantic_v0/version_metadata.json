@@ -1,0 +1,15 @@
+{
+  "version": "semantic_v0",
+  "benchmark": "DDR-Bench",
+  "database": "",
+  "schema": "Ontology-Inspired Semantic Layer Schema v1",
+  "object_counts": {
+    "terms": 3,
+    "mappings": 3,
+    "relations": 0,
+    "constraints": 0,
+    "evidence": 6
+  },
+  "sample": true,
+  "sample_note": "Representative anonymized records only; the full v0 archive is not part of the supplementary code."
+}

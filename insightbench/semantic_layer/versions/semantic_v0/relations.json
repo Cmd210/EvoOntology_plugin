@@ -1,0 +1,24 @@
+[
+  {
+    "id": "relation.core.duration_inputs",
+    "source": "term.core.duration",
+    "relation_type": "derivation",
+    "target": "term.core.time",
+    "connection_condition": "Duration requires two compatible timestamps (start and end). In practice: opened_at→closed_at or start_date→end_date.",
+    "description": "",
+    "evidence": [
+      "evidence.relation.core.duration_inputs"
+    ]
+  },
+  {
+    "id": "relation.core.entity_has_time",
+    "source": "term.core.entity",
+    "relation_type": "association",
+    "target": "term.core.time",
+    "connection_condition": "Each entity may have one or more timestamps. 19/27 groups have opened_at; all domains have at least one time column.",
+    "description": "",
+    "evidence": [
+      "evidence.relation.core.entity_has_time"
+    ]
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "term.finance.revenue",
+    "name": "Revenue",
+    "type": "metric",
+    "definition": "Consolidated revenue reported for a fiscal period.",
+    "scope": "ddr_bench / 10k / financial_analysis",
+    "aliases": [
+      "total revenue",
+      "revenues",
+      "sales revenue"
+    ],
+    "evidence": [
+      "evidence.term.finance.revenue"
+    ]
+  },
+  {
+    "id": "term.finance.net_income",
+    "name": "Net Income",
+    "type": "metric",
+    "definition": "Consolidated net income or loss for a fiscal period.",
+    "scope": "ddr_bench / 10k / financial_analysis",
+    "aliases": [
+      "net profit",
+      "net income loss",
+      "bottom-line earnings"
+    ],
+    "evidence": [
+      "evidence.term.finance.net_income"
+    ]
+  },
+  {
+    "id": "term.finance.operating_income",
+    "name": "Operating Income",
+    "type": "metric",
+    "definition": "Income or loss from consolidated operations before non-operating items.",
+    "scope": "ddr_bench / 10k / financial_analysis",
+    "aliases": [
+      "operating profit",
+      "operating income loss"
+    ],
+    "evidence": [
+      "evidence.term.finance.operating_income"
+    ]
+  }
+]

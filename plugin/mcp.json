@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "evo-semantic": {
+      "command": "python",
+      "args": [
+        "<path-to>/evo/mcp_server.py",
+        "--store",
+        "<workspace-root>"
+      ]
+    }
+  }
+}
