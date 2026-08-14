@@ -61,12 +61,13 @@ spawn 时展开为插件根目录，无需手填。
 接入后 Data Agent 可见 `browse_semantics`、`resolve_semantics` 两个工具与
 `evo-semantic://session-manifest` 资源。
 
-## 发布门禁
+## 发布校验（agent 自动）
 
-发布前运行确定性校验（JSON 合法 / 引用完整 / 可加载）：
+`/evo-build`、`/evo-evolve` 发布新版本前，agent 会自动调用 `scripts/validate.py` 做确定性门禁
+（JSON 合法 / 引用完整 / 可加载），用户无需手动执行。仅手动诊断 workspace 时才直接运行：
 
 ```bash
-python plugin/scripts/validate.py --root <workspace-root>
+python scripts/validate.py --root <workspace-root>
 ```
 
 只做结构校验，不做数据库语义校验。

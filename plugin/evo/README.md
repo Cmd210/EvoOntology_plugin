@@ -51,7 +51,8 @@ server 暴露 `browse_semantics`、`resolve_semantics` 两个工具与
 
 ## 校验
 
-发布门禁在 `plugin/scripts/validate.py`：
+发布门禁在 `plugin/scripts/validate.py`，agent 在 `/evo-build`、`/evo-evolve` 发布新版本前
+自动调用，用户无需手动执行：
 
 ```bash
 python plugin/scripts/validate.py --root <workspace>

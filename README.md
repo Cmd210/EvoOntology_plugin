@@ -39,14 +39,6 @@ Agent 在会话中用两个 MCP 工具查询：
 语义层会自进化：`/evo-build` 构建初始 `semantic_v0`；`/evo-evolve` 依据历史任务轨迹走
 「诊断 → 归因 → 补丁 → 评估 → 发布新版本」。
 
-## 发布门禁
-
-发布前运行确定性校验（JSON 合法 / 引用完整 / 可加载）：
-
-```bash
-python plugin/scripts/validate.py --root <workspace-root>
-```
-
 ## 三个 benchmark 接入示例
 
 `benchmarks/` 下是三个 benchmark 的接入示例，各含 Agent 实现、语义运行时、MCP server
