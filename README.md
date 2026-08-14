@@ -56,12 +56,13 @@ four-file runtime (`models` / `store` / `runtime` / `mcp_server`) — and the
 lives in the skills; the Python package provides only the runtime.
 
 ```bash
-python -m evo.mcp_server --store <workspace>              # start the semantic MCP server
+python <path-to>/evo/mcp_server.py --store <workspace>    # MCP server (spawned by client via plugin/mcp.json)
 python plugin/scripts/validate.py --root <workspace>      # publish-time gate
 ```
 
-A Data Agent connects to the server through `plugin/mcp.json`, which spawns the
-equivalent script form `python <path-to>/evo/mcp_server.py --store <workspace>`.
+The server is not started by hand in normal use — a Data Agent spawns it through
+`plugin/mcp.json`. `python -m evo.mcp_server --store <workspace>` is the
+equivalent manual form for local verification.
 
 See `USAGE.md` for a full walkthrough, and `evo/README.md` / `plugin/README.md`
 for component details.
