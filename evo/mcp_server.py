@@ -19,7 +19,13 @@ from mcp.server import stdio
 from mcp.server.lowlevel import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
 
-from .runtime import SemanticLayer
+if __package__:
+    from .runtime import SemanticLayer
+else:
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from evo.runtime import SemanticLayer
 
 _RESOURCE_URI = "evo-semantic://session-manifest"
 
