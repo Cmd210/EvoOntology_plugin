@@ -38,18 +38,29 @@ bird/ ddr/ insightbench/   三个 benchmark 的接入示例（含合法 workspac
 
 ### 1) 接入 Data Agent（MCP）
 
-编辑 `plugin/mcp.json` 填入两个占位符，MCP client 会自动拉起服务（无需手动起服）：
+语义 MCP 服务是一个后台进程：加载指定 workspace 的语义层，通过 MCP 协议暴露
+`browse_semantics` / `resolve_semantics` 两个工具供 Data Agent 调用。它由 MCP client
+按 `plugin/mcp.json` 自动拉起，**正常使用无需手动起服**。
+
+编辑 `plugin/mcp.json` 填入两个占位符：
 
 - `<path-to>`：本目录的绝对路径；
-- `<workspace-root>`：语义层 workspace 根目录（如 `ddr/semantic_layer`，建议绝对路径）。
+- `<workspace-root>`：语义层 workspace 根目录（含 `active.json` 的目录，如
+  `ddr/semantic_layer`，建议绝对路径）。
 
-服务实际以脚本形式启动：
+client 实际用脚本形式拉起服务：
 
 ```bash
 python <path-to>/evo/mcp_server.py --store <workspace-root>
 ```
 
-本地验证可用等价模块形式 `python -m evo.mcp_server --store <workspace>`。
+本地手动验证服务能否正常启动时，用等价模块形式（在本目录下执行）：
+
+```bash
+python -m evo.mcp_server --store <workspace-root>
+```
+
+两条命令做的是同一件事，`--store` 后面的参数就是语义层所在目录。
 
 ### 2) 构建 / 进化
 
