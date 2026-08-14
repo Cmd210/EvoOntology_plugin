@@ -18,7 +18,7 @@ relative to this directory unless overridden on the command line.
 
 ## Single-question execution
 
-Run from the `bird/` directory:
+Run from this directory:
 
 ```bash
 python run_agent.py \

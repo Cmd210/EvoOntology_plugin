@@ -2,7 +2,7 @@
 
 为 Data Agent 提供**自进化的语义层（Ontology Layer）**：在自然语言问题与数据库 schema
 之间加一层可版本化、可自我改进的语义映射。本仓库 = `evo/` 运行时 + `plugin/` 插件，外加
-三个 benchmark 接入示例（`bird/`、`ddr/`、`insightbench/`）。
+`benchmarks/` 下的三个 benchmark 接入示例。
 
 ## 作用
 
@@ -18,21 +18,21 @@ Agent 在会话中用两个 MCP 工具查询：
 
 ## 三个 benchmark 接入示例
 
-`bird/`、`ddr/`、`insightbench/` 是三个 benchmark 的接入示例，各含 Agent 实现、语义
-运行时、MCP server 与评估入口；其 `semantic_layer/` 目录是合法 workspace，可直接作为
-`--store` / `--root` 使用。
+`benchmarks/` 下是三个 benchmark 的接入示例，各含 Agent 实现、语义运行时、MCP server
+与评估入口；其 `semantic_layer/` 目录是合法 workspace，可直接作为 `--store` / `--root`
+使用。
 
 | 目录 | 基准 | 任务类型 |
 | --- | --- | --- |
-| `bird/` | BIRD | text-to-SQL |
-| `ddr/` | DDR | 自主数据分析 |
-| `insightbench/` | InsightBench | 迭代分析 / 代码生成 |
+| `benchmarks/bird/` | BIRD | text-to-SQL |
+| `benchmarks/ddr/` | DDR | 自主数据分析 |
+| `benchmarks/insightbench/` | InsightBench | 迭代分析 / 代码生成 |
 
 ## 安装
 
 1. Python 3.10+；
 2. `python -m pip install "mcp>=1.0"`；
-3. 按需 `python -m pip install -r <benchmark>/requirements.txt`。
+3. 按需 `python -m pip install -r benchmarks/<benchmark>/requirements.txt`。
 
 `evo` 包无需单独安装，在本目录下直接运行。模型凭据从环境变量读取，benchmark 数据需本地
 自备（见各 benchmark 目录的 README）。
@@ -45,7 +45,7 @@ Agent 在会话中用两个 MCP 工具查询：
 
 - `<path-to>`：本目录的绝对路径；
 - `<workspace-root>`：语义层 workspace 根目录（含 `active.json` 的目录，如
-  `ddr/semantic_layer`）。
+  `benchmarks/ddr/semantic_layer`）。
 
 配置后，MCP client 会在 Agent 运行时自动拉起语义服务并连上，无需手动启动。
 

@@ -262,7 +262,7 @@ agent 发布前调用 `plugin/scripts/validate.py` 做门禁（引用完整性 +
 
 ## 10. 影响面
 
-- **benchmark 目录不受影响**：已确认 `bird/`、`ddr/`、`insightbench/` 未 import evo 包。
+- **benchmark 目录不受影响**：已确认 `benchmarks/` 下三个目录未 import evo 包。
 - **git 历史保留**：被删代码在历史提交中可找回。
 - **`python -m evo` 失效**：预期行为；运行时入口为 `python -m evo.mcp_server`。
 - **四件套代码本身不改**，MCP 运行时行为不变。
@@ -271,9 +271,9 @@ agent 发布前调用 `plugin/scripts/validate.py` 做门禁（引用完整性 +
 
 1. `python -m compileall -q evo plugin` → exit 0。
 2. `python -c "from evo import SemanticStore, SemanticLayer, Term, Mapping, Relation, Constraint, Evidence"` → 成功。
-3. 冒烟：`SemanticStore.load('ddr/semantic_layer')` + `manifest()` + `resolve(mentions=['revenue'])` 正常。
-4. `python -m evo.mcp_server --store ddr/semantic_layer` 可起服（或 import 构造成功）。
-5. `plugin/scripts/validate.py --root ddr/semantic_layer` → 引用完整性 + 可加载通过。
+3. 冒烟：`SemanticStore.load('benchmarks/ddr/semantic_layer')` + `manifest()` + `resolve(mentions=['revenue'])` 正常。
+4. `python -m evo.mcp_server --store benchmarks/ddr/semantic_layer` 可起服（或 import 构造成功）。
+5. `plugin/scripts/validate.py --root benchmarks/ddr/semantic_layer` → 引用完整性 + 可加载通过。
 6. `git status` 复核改动只落在 `evo/`、`plugin/`、文档。
 
 ## 12. 执行顺序

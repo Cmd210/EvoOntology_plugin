@@ -22,7 +22,7 @@ through the fields in the YAML file.
 
 ## Agent execution
 
-Run from the `ddr/` directory:
+Run from this directory:
 
 ```bash
 python run_agent.py \

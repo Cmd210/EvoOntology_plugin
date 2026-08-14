@@ -1,7 +1,7 @@
 # EvoOntology 产品化使用指南
 
 本文档说明产品化完成后，如何实际使用 EvoOntology。产品化把散落在
-`bird/`、`ddr/`、`insightbench/` 里的通用能力抽取为两个**新增、自包含**的部件：
+`benchmarks/` 三个目录里的通用能力抽取为两个**新增、自包含**的部件：
 
 - `evo/` —— benchmark 无关的产品运行时四件套（models / store / runtime / mcp_server）。
 - `plugin/` —— Claude Code / Codex 侧封装（两个触发命令 + skills + MCP 配置 +
@@ -88,7 +88,7 @@ serve 不需要 config.yaml；只有走 evolve 评估（agent Step 4）时才需
 编辑 `plugin/mcp.json`，填入两处占位符：
 
 - `<path-to>`：本 `supplementary_materials/` 目录的绝对路径；
-- `<workspace-root>`：ontology workspace（如 `ddr/semantic_layer`，建议绝对路径）。
+- `<workspace-root>`：ontology workspace（如 `benchmarks/ddr/semantic_layer`，建议绝对路径）。
 
 mcp.json 以脚本形式 spawn 服务，client 自动拉起、无需手动起服：
 
@@ -106,7 +106,7 @@ python <path-to>/evo/mcp_server.py --store <workspace-root>
 手动起服（验证用，等价于上面的模块形式）：
 
 ```bash
-python -m evo.mcp_server --store ddr/semantic_layer
+python -m evo.mcp_server --store benchmarks/ddr/semantic_layer
 ```
 
 这两个工具返回的是元数据与指引，数据库查询与 Python 执行仍由 benchmark 原生工具负责。
@@ -118,7 +118,7 @@ python -m evo.mcp_server --store ddr/semantic_layer
 agent 发布前调用 `plugin/scripts/validate.py` 做确定性门禁（JSON 合法 / 引用完整 / 可加载）：
 
 ```bash
-python plugin/scripts/validate.py --root ddr/semantic_layer
+python plugin/scripts/validate.py --root benchmarks/ddr/semantic_layer
 # → {"passed": true, "root": "...", "version": "semantic_v0", "errors": []}
 ```
 

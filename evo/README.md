@@ -1,7 +1,7 @@
 # EvoOntology Product Runtime (`evo`)
 
 The benchmark-independent core of EvoOntology, extracted from the three
-benchmark adapters (`bird/`, `ddr/`, `insightbench/`). It provides the
+benchmark adapters (`benchmarks/bird/`, `benchmarks/ddr/`, `benchmarks/insightbench/`). It provides the
 versioned semantic store loader, the generic semantic runtime, and the
 two-tool MCP server. Build and evolve analysis live in the plugin skills; this
 package provides only the runtime.

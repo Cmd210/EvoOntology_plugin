@@ -37,7 +37,7 @@ the agent following the corresponding skill.
 Edit `mcp.json` to fill the two placeholders:
 
 - `<path-to>`: the absolute path to this `supplementary_materials/` directory;
-- `<workspace-root>`: the ontology workspace (e.g. `ddr/semantic_layer`, or a
+- `<workspace-root>`: the ontology workspace (e.g. `benchmarks/ddr/semantic_layer`, or a
   product workspace).
 
 The client spawns the server as
