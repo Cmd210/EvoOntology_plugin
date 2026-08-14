@@ -54,13 +54,13 @@ client 实际用脚本形式拉起服务：
 python <path-to>/evo/mcp_server.py --store <workspace-root>
 ```
 
-本地手动验证服务能否正常启动时，用等价模块形式（在本目录下执行）：
+（可选）本地调试：想单独确认服务能否正常启动时，在本目录下用等价模块形式手动跑一次：
 
 ```bash
 python -m evo.mcp_server --store <workspace-root>
 ```
 
-两条命令做的是同一件事，`--store` 后面的参数就是语义层所在目录。
+两条命令做的是同一件事，`--store` 后面的参数就是语义层所在目录。这一步不属于接入流程，正常使用跳过即可。
 
 ### 2) 构建 / 进化
 
