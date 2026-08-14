@@ -16,6 +16,18 @@ Agent 在会话中用两个 MCP 工具查询：
 语义层会自进化：`/evo-build` 构建初始 `semantic_v0`；`/evo-evolve` 依据历史任务轨迹走
 「诊断 → 归因 → 补丁 → 评估 → 发布新版本」。
 
+## 三个 benchmark 接入示例
+
+`bird/`、`ddr/`、`insightbench/` 是三个 benchmark 的接入示例，各含 Agent 实现、语义
+运行时、MCP server 与评估入口；其 `semantic_layer/` 目录是合法 workspace，可直接作为
+`--store` / `--root` 使用。
+
+| 目录 | 基准 | 任务类型 |
+| --- | --- | --- |
+| `bird/` | BIRD | text-to-SQL |
+| `ddr/` | DDR | 自主数据分析 |
+| `insightbench/` | InsightBench | 迭代分析 / 代码生成 |
+
 ## 安装
 
 1. Python 3.10+；
