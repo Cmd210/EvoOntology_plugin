@@ -88,9 +88,14 @@ serve 不需要 config.yaml；只有走 evolve 评估（agent Step 4）时才需
 编辑 `plugin/mcp.json`，填入两处占位符：
 
 - `<path-to>`：本 `supplementary_materials/` 目录的绝对路径；
-- `<workspace-root>`：ontology workspace（如 `ddr/semantic_layer`）。
+- `<workspace-root>`：ontology workspace（如 `ddr/semantic_layer`，建议绝对路径）。
 
-配置指向 `evo/mcp_server.py --store <workspace-root>`，client 自动 spawn，无需手动起服。
+mcp.json 以脚本形式 spawn 服务，client 自动拉起、无需手动起服：
+
+```bash
+python <path-to>/evo/mcp_server.py --store <workspace-root>
+```
+
 接入后 Data Agent 可见：
 
 - 工具 `browse_semantics(query, kind, limit)` —— 发现相关概念；
@@ -98,7 +103,7 @@ serve 不需要 config.yaml；只有走 evolve 评估（agent Step 4）时才需
   关联的 relation / constraint / evidence；
 - 资源 `evo-semantic://session-manifest` —— 会话开始时读取的简洁说明。
 
-手动起服（验证用）：
+手动起服（验证用，等价于上面的模块形式）：
 
 ```bash
 python -m evo.mcp_server --store ddr/semantic_layer

@@ -19,8 +19,11 @@ evo/
 ## Runtime entry point
 
 ```bash
-# from the supplementary_materials/ directory
+# manual start (module form)
 python -m evo.mcp_server --store <workspace>
+
+# equivalent script form (used by plugin/mcp.json for auto-spawn)
+python <path-to>/evo/mcp_server.py --store <workspace>
 ```
 
 A workspace root contains `active.json` and `versions/<v>/` with the five

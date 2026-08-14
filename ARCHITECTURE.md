@@ -1,4 +1,4 @@
-# EvoOntology 运行时精简方案
+# EvoOntology 架构设计
 
 ## 1. 背景与结论
 
@@ -252,7 +252,7 @@ final_answer / task_status / errors`（评估结果不落轨迹，归 `evolution
 /evo-build
 
 # 2. Data Agent 通过 MCP 接入（mcp.json 里声明，client 自动 spawn，无需手动起服）
-#    mcp.json: python -m evo.mcp_server --store <workspace>
+#    mcp.json: python <path-to>/evo/mcp_server.py --store <workspace-root>
 
 # 3. 触发进化（用户在 Claude Code 里输入；或轨迹达到阈值后提示 due 时触发）
 /evo-evolve        # agent 诊断→补丁→gate；accept 后 agent 自行发布（bash cp + 改 active.json）

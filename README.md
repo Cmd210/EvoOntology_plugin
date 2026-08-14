@@ -49,20 +49,22 @@ The two manifest-related artifacts have distinct roles:
 
 ## Productized runtime (`evo` + `plugin`)
 
-The benchmark-independent product core is extracted into the `evo/` package —
-a four-file runtime (`models` / `store` / `runtime` / `mcp_server`) plus a
-two-tool MCP server — and the `plugin/` directory, which packages the two
-trigger commands (`/evo-build`, `/evo-evolve`) and their skills. Build and
-evolve analysis lives in the skills; the Python package provides only the
-runtime and a minimal validation gate.
+The benchmark-independent product core is extracted into the `evo/` package — a
+four-file runtime (`models` / `store` / `runtime` / `mcp_server`) — and the
+`plugin/` directory, which packages the two trigger commands (`/evo-build`,
+`/evo-evolve`), their skills, and a validation gate. Build and evolve analysis
+lives in the skills; the Python package provides only the runtime.
 
 ```bash
 python -m evo.mcp_server --store <workspace>              # start the semantic MCP server
 python plugin/scripts/validate.py --root <workspace>      # publish-time gate
 ```
 
-See `evo/README.md`, `plugin/README.md`, `USAGE.md`, and
-`PRODUCTIZATION_LOG.md` for details.
+A Data Agent connects to the server through `plugin/mcp.json`, which spawns the
+equivalent script form `python <path-to>/evo/mcp_server.py --store <workspace>`.
+
+See `USAGE.md` for a full walkthrough, and `evo/README.md` / `plugin/README.md`
+for component details.
 
 ## Environment
 

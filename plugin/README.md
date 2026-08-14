@@ -40,7 +40,9 @@ Edit `mcp.json` to fill the two placeholders:
 - `<workspace-root>`: the ontology workspace (e.g. `ddr/semantic_layer`, or a
   product workspace).
 
-The server exposes `browse_semantics`, `resolve_semantics`, and the
+The client spawns the server as
+`python <path-to>/evo/mcp_server.py --store <workspace-root>`; no manual start
+is needed. The server exposes `browse_semantics`, `resolve_semantics`, and the
 `evo-semantic://session-manifest` resource.
 
 ## Validation gate
