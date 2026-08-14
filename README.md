@@ -1,8 +1,8 @@
 # EvoOntology 插件
 
 为 Data Agent 提供**自进化的语义层（Ontology Layer）**：在自然语言问题与数据库 schema
-之间加一层可版本化、可自我改进的语义映射。本仓库 = `evo/` 运行时 + `plugin/` 插件，外加
-`benchmarks/` 下的三个 benchmark 接入示例。
+之间加一层可版本化、可自我改进的语义映射。本仓库 = `plugin/` 插件（内含 `evo/` 运行时），
+外加 `benchmarks/` 下的三个 benchmark 接入示例。
 
 ## 作用
 
@@ -30,24 +30,25 @@ Agent 在会话中用两个 MCP 工具查询：
 
 ## 安装
 
-1. Python 3.10+；
-2. `python -m pip install "mcp>=1.0"`；
-3. 按需 `python -m pip install -r benchmarks/<benchmark>/requirements.txt`。
+作为 Claude Code 插件安装（推荐）：
 
-`evo` 包无需单独安装，在本目录下直接运行。模型凭据从环境变量读取，benchmark 数据需本地
-自备（见各 benchmark 目录的 README）。
+```bash
+claude plugin install /path/to/EvoOntology_plugin/plugin
+```
+
+安装后 `/evo-build`、`/evo-evolve` 命令与语义 MCP 自动就位。运行 benchmark 另需
+Python 3.10+、`python -m pip install "mcp>=1.0"`、按需
+`python -m pip install -r benchmarks/<benchmark>/requirements.txt`。模型凭据从环境变量
+读取，benchmark 数据需本地自备（见各 benchmark 目录的 README）。
 
 ## 使用
 
 ### 接入 Data Agent（MCP）
 
-编辑 `plugin/mcp.json`，把两处占位符换成实际值：
-
-- `<path-to>`：本目录的绝对路径；
-- `<workspace-root>`：语义层 workspace 根目录（含 `active.json` 的目录，如
-  `benchmarks/ddr/semantic_layer`）。
-
-配置后，MCP client 会在 Agent 运行时自动拉起语义服务并连上，无需手动启动。
+插件已通过 `plugin/.mcp.json` 声明语义服务，client 会在 Agent 运行时自动拉起、无需手动
+起服。安装后只需把 `<workspace-root>` 占位符换成你的 ontology workspace 绝对路径（含
+`active.json` 的目录，如 `benchmarks/ddr/semantic_layer`）；`${CLAUDE_PLUGIN_ROOT}` 由
+client 自动展开为插件根目录。
 
 ### 构建 / 进化
 
@@ -70,5 +71,5 @@ python plugin/scripts/validate.py --root <workspace-root>
 
 ## 文档
 
-`USAGE.md`（完整使用指南）· `ARCHITECTURE.md`（架构设计）· `evo/README.md`、
-`plugin/README.md`（组件说明）· `plugin/docs/`（版本命名 / 评估协议 / 轨迹格式）。
+`USAGE.md`（完整使用指南）· `ARCHITECTURE.md`（架构设计）· `plugin/README.md`、
+`plugin/evo/README.md`（组件说明）· `plugin/docs/`（版本命名 / 评估协议 / 轨迹格式）。

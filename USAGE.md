@@ -85,15 +85,12 @@ serve 不需要 config.yaml；只有走 evolve 评估（agent Step 4）时才需
 
 ## 5. MCP 接入
 
-编辑 `plugin/mcp.json`，填入两处占位符：
-
-- `<path-to>`：本 `supplementary_materials/` 目录的绝对路径；
-- `<workspace-root>`：ontology workspace（如 `benchmarks/ddr/semantic_layer`，建议绝对路径）。
-
-mcp.json 以脚本形式 spawn 服务，client 自动拉起、无需手动起服：
+插件通过 `plugin/.mcp.json` 以脚本形式 spawn 服务，client 自动拉起、无需手动起服。安装后只需
+把 `<workspace-root>` 占位符换成你的 ontology workspace 绝对路径（如
+`benchmarks/ddr/semantic_layer`）；`${CLAUDE_PLUGIN_ROOT}` 由 client 自动展开为插件根目录：
 
 ```bash
-python <path-to>/evo/mcp_server.py --store <workspace-root>
+python ${CLAUDE_PLUGIN_ROOT}/evo/mcp_server.py --store <workspace-root>
 ```
 
 接入后 Data Agent 可见：
@@ -103,7 +100,13 @@ python <path-to>/evo/mcp_server.py --store <workspace-root>
   关联的 relation / constraint / evidence；
 - 资源 `evo-semantic://session-manifest` —— 会话开始时读取的简洁说明。
 
-手动起服（验证用，等价于上面的模块形式）：
+手动起服（验证用，脚本形式）：
+
+```bash
+python plugin/evo/mcp_server.py --store benchmarks/ddr/semantic_layer
+```
+
+模块形式（先 `pip install -e plugin/`）：
 
 ```bash
 python -m evo.mcp_server --store benchmarks/ddr/semantic_layer
@@ -135,8 +138,8 @@ cd supplementary_materials
 # 1. 触发构建 semantic_v0（在 Claude Code 里输入）
 /evo-build
 
-# 2. Data Agent 通过 MCP 接入（mcp.json 声明，client 自动 spawn，无需手动起服）
-#    mcp.json 指向 evo/mcp_server.py --store <workspace>
+# 2. Data Agent 通过 MCP 接入（.mcp.json 声明，client 自动 spawn，无需手动起服）
+#    .mcp.json 指向 ${CLAUDE_PLUGIN_ROOT}/evo/mcp_server.py --store <workspace>
 
 # 3. 触发进化（在 Claude Code 里输入；或轨迹达到阈值后提示 due 时触发）
 /evo-evolve        # agent 诊断→补丁→gate；accept 后 agent 自行发布（bash cp + 改 active.json）

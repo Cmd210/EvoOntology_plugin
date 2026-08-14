@@ -7,7 +7,7 @@
 
 **产品最终形态 = 一个运行时（evo 四件套）+ 一个 validate 脚本 + 两个 skill 命令，无 CLI。**
 
-- 运行时：`evo/mcp_server.py`，由 MCP client 读 `mcp.json` 自动 spawn，无 `serve` 命令。
+- 运行时：`plugin/evo/mcp_server.py`，由 MCP client 读 `plugin/.mcp.json` 自动 spawn，无 `serve` 命令。
 - 校验：`plugin/scripts/validate.py`，只做引用完整性 + 可加载。
 - 触发指令：`/evo-build`（构建 semantic_v0）、`/evo-evolve`（触发进化）。
 
@@ -18,7 +18,10 @@
 产品由三部分组成：plugin（指令层）、evo（运行时）、workspace（版本化存储）。
 
 ```
-plugin/（标准自包含目录）
+plugin/（插件根，标准自包含目录）
+  .claude-plugin/plugin.json     插件清单（name / version / description）
+  .mcp.json                      Data Agent 接入语义层的 MCP 配置
+  pyproject.toml                 evo 包的 pip 打包配置
   commands/evo-build.md          /evo-build（构建 semantic_v0）
   commands/evo-evolve.md         /evo-evolve（触发进化）
   skills/                        build / evolve 两个 skill（从上游移入，内容不动）
@@ -26,14 +29,12 @@ plugin/（标准自包含目录）
   docs/evaluation-protocol.md    评估协议（绝对评分 vs 相对比较 + LLM Judge）
   docs/trajectory-format.md      轨迹格式规范
   scripts/validate.py            引用完整性 + 可加载校验
-  mcp.json                       Data Agent 接入语义层的 MCP 配置
   config.template.yaml           config.yaml 模板（用户复制填写，见 §4）
-
-evo/（运行时四件套）
-  models.py      5 类记录 dataclass（Term / Mapping / Relation / Constraint / Evidence）
-  store.py       SemanticStore：active.json -> versions/<v>/ 下 5 个 JSON
-  runtime.py     SemanticLayer：manifest / browse / resolve
-  mcp_server.py  2-tool MCP server + session-manifest 资源
+  evo/（运行时四件套）
+    models.py      5 类记录 dataclass（Term / Mapping / Relation / Constraint / Evidence）
+    store.py       SemanticStore：active.json -> versions/<v>/ 下 5 个 JSON
+    runtime.py     SemanticLayer：manifest / browse / resolve
+    mcp_server.py  2-tool MCP server + session-manifest 资源
 
 workspace（<root>/，语义层版本化存储）
   active.json      当前激活版本指针
@@ -252,7 +253,7 @@ final_answer / task_status / errors`（评估结果不落轨迹，归 `evolution
 /evo-build
 
 # 2. Data Agent 通过 MCP 接入（mcp.json 里声明，client 自动 spawn，无需手动起服）
-#    mcp.json: python <path-to>/evo/mcp_server.py --store <workspace-root>
+#    .mcp.json: python ${CLAUDE_PLUGIN_ROOT}/evo/mcp_server.py --store <workspace-root>
 
 # 3. 触发进化（用户在 Claude Code 里输入；或轨迹达到阈值后提示 due 时触发）
 /evo-evolve        # agent 诊断→补丁→gate；accept 后 agent 自行发布（bash cp + 改 active.json）
@@ -269,10 +270,10 @@ agent 发布前调用 `plugin/scripts/validate.py` 做门禁（引用完整性 +
 
 ## 11. 验证步骤
 
-1. `python -m compileall -q evo plugin` → exit 0。
+1. `python -m compileall -q plugin` → exit 0。
 2. `python -c "from evo import SemanticStore, SemanticLayer, Term, Mapping, Relation, Constraint, Evidence"` → 成功。
 3. 冒烟：`SemanticStore.load('benchmarks/ddr/semantic_layer')` + `manifest()` + `resolve(mentions=['revenue'])` 正常。
-4. `python -m evo.mcp_server --store benchmarks/ddr/semantic_layer` 可起服（或 import 构造成功）。
+4. `python plugin/evo/mcp_server.py --store benchmarks/ddr/semantic_layer` 可起服（或 import 构造成功）。
 5. `plugin/scripts/validate.py --root benchmarks/ddr/semantic_layer` → 引用完整性 + 可加载通过。
 6. `git status` 复核改动只落在 `evo/`、`plugin/`、文档。
 

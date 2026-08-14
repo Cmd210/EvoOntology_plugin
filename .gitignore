@@ -10,3 +10,4 @@ results/
 *.sqlite
 *.db
 *.log
+*.egg-info/

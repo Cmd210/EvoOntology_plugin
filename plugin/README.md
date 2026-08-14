@@ -1,57 +1,81 @@
 # EvoOntology Plugin
 
-This directory packages the Claude Code / Codex side of EvoOntology: the two
-trigger commands (`/evo-build`, `/evo-evolve`), their skills, the semantic MCP
-configuration, and the deterministic validation gate. It is the "Claude Code /
-Codex Plugin" component described in `EvoOntology_产品化设计方案_v1.md`.
+把 EvoOntology 打包成 Claude Code 插件：提供 `/evo-build`、`/evo-evolve` 两个命令、
+builder / evolver 两个 skill，以及语义 MCP 运行时。安装后命令与 skill 自动就位，语义
+MCP 由 `.mcp.json` 自动接入。
 
-## Components
+## 组件
 
-| Component | Location | Role |
+| 组件 | 位置 | 作用 |
 | --- | --- | --- |
-| Build command | `commands/evo-build.md` | `/evo-build` — build `semantic_v0` |
-| Evolve command | `commands/evo-evolve.md` | `/evo-evolve` — trigger evolution |
-| Builder skill | `skills/build-semantic-layer/` | initialize the ontology |
-| Evolver skill | `skills/evolve-semantic-layer/` | diagnose, patch, and gate |
-| MCP config | `mcp.json` | connect the semantic runtime to a Data Agent |
-| Validate gate | `scripts/validate.py` | reference completeness + loadability |
-| Docs | `docs/` | versioning / evaluation protocol / trajectory format |
+| Build 命令 | `commands/evo-build.md` | `/evo-build` 构建 `semantic_v0` |
+| Evolve 命令 | `commands/evo-evolve.md` | `/evo-evolve` 触发进化 |
+| Builder skill | `skills/build-semantic-layer/` | 构建初始语义层 |
+| Evolver skill | `skills/evolve-semantic-layer/` | 诊断 → 归因 → 补丁 → gate |
+| MCP 配置 | `.mcp.json` | 语义 MCP server 自动接入 |
+| 运行时 | `evo/` | 四件套（models / store / runtime / mcp_server） |
+| 校验门禁 | `scripts/validate.py` | 引用完整性 + 可加载 |
 
-## Trigger commands
+## 安装
 
-`/evo-build` and `/evo-evolve` are the only trigger commands. They are not
-deterministic Python operations — the actual build / evolution is performed by
-the agent following the corresponding skill.
-
-- `/evo-build` runs the Builder skill: read the workload, explore the data
-  environment, generate the five semantic record types, validate, and publish
-  `semantic_v0`.
-- `/evo-evolve` runs the Evolver skill: read historical trajectories, diagnose
-  and attribute problems, produce one local Candidate, run Parent/Candidate
-  evaluation, and accept or reject. See `docs/evaluation-protocol.md` for the
-  ground-truth / LLM-judge protocols and `docs/versioning.md` for version
-  naming.
-
-## MCP configuration
-
-Edit `mcp.json` to fill the two placeholders:
-
-- `<path-to>`: the absolute path to this `supplementary_materials/` directory;
-- `<workspace-root>`: the ontology workspace (e.g. `benchmarks/ddr/semantic_layer`, or a
-  product workspace).
-
-The client spawns the server as
-`python <path-to>/evo/mcp_server.py --store <workspace-root>`; no manual start
-is needed. The server exposes `browse_semantics`, `resolve_semantics`, and the
-`evo-semantic://session-manifest` resource.
-
-## Validation gate
+本目录就是插件根（清单在 `.claude-plugin/plugin.json`）。用本地路径安装：
 
 ```bash
-# deterministic preflight before publishing
+claude plugin install /path/to/EvoOntology_plugin/plugin
+```
+
+或先 clone 仓库，再安装其 `plugin/` 子目录。
+
+> 注意：清单放在 `plugin/` 子目录而非仓库根，因此 `claude plugin install <git-url>`
+> 直接安装不适用（git 安装会找仓库根的清单）。请 clone 后安装 `plugin/` 子目录，或把
+> 本目录单独作为仓库发布。
+
+## 使用
+
+安装后可用两个触发命令：
+
+- `/evo-build` —— 读数据、探索 schema、生成五类记录，发布 `semantic_v0`；
+- `/evo-evolve` —— 诊断 → 归因 → 补丁 → Parent/Candidate gate → 落地。
+
+两者是触发指令，实际构建 / 进化由 agent 按对应 skill 执行。
+
+### 接入语义 MCP
+
+`.mcp.json` 以脚本形式 spawn 语义服务，client 自动拉起：
+
+```json
+{
+  "mcpServers": {
+    "evo-semantic": {
+      "command": "python",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/evo/mcp_server.py", "--store", "<workspace-root>"]
+    }
+  }
+}
+```
+
+安装后把 `<workspace-root>` 换成你的 ontology workspace 绝对路径（含 `active.json` 的目录，
+如本仓库 `benchmarks/ddr/semantic_layer`）。`${CLAUDE_PLUGIN_ROOT}` 由 Claude Code 在
+spawn 时展开为插件根目录，无需手填。
+
+接入后 Data Agent 可见 `browse_semantics`、`resolve_semantics` 两个工具与
+`evo-semantic://session-manifest` 资源。
+
+## 发布门禁
+
+发布前运行确定性校验（JSON 合法 / 引用完整 / 可加载）：
+
+```bash
 python plugin/scripts/validate.py --root <workspace-root>
 ```
 
-This script checks JSON validity, cross-record reference completeness, and
-store loadability. It performs deterministic checks only; it never generates
-or mutates semantic content.
+只做结构校验，不做数据库语义校验。
+
+## 运行时安装（可选）
+
+`evo/` 运行时默认被 `.mcp.json` 以脚本形式直接调用，无需安装。若想作为 Python 包使用：
+
+```bash
+pip install -e plugin/
+python -m evo.mcp_server --store <workspace>   # 模块形式启动
+```

@@ -14,14 +14,14 @@ description: 触发进化——诊断→归因→补丁→Parent/Candidate gate�
   声明的数据源路径。Evolver 只读这些数据，不改数据本身。
 - **工作量（workload）**：`<workspace>/trajectories/` 下累积的历史任务轨迹（进化诊断的
   输入），以及评估所需的验证集问题与 ground truth（按
-  `plugin/docs/evaluation-protocol.md` 的有 GT / 无 GT 两条协议取用）。
+  `docs/evaluation-protocol.md` 的有 GT / 无 GT 两条协议取用）。
 
 ## 执行
 
-执行 `evolve-semantic-layer` skill（`plugin/skills/evolve-semantic-layer/`），触发一次进化循环。
+执行 `evolve-semantic-layer` skill（`skills/evolve-semantic-layer/`），触发一次进化循环。
 
 按 skill 的 Evolution Loop 执行：Diagnose → Attribute → Patch → Evaluate/Gate。评估协议见
-`plugin/docs/evaluation-protocol.md`（有 GT 绝对评分 / 无 GT LLM Judge 相对比较）。
+`docs/evaluation-protocol.md`（有 GT 绝对评分 / 无 GT LLM Judge 相对比较）。
 
-accept 后按 `plugin/docs/versioning.md` 把候选 `vN-cK` 发布为 `semantic_vN+1`（改
+accept 后按 `docs/versioning.md` 把候选 `vN-cK` 发布为 `semantic_vN+1`（改
 `active.json` 指针）。
