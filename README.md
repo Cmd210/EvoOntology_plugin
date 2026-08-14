@@ -1,98 +1,84 @@
-# EvoOntology Supplementary Implementation
+# EvoOntology 插件
 
-This package provides the implementation used to integrate EvoOntology with
-BIRD, DDR, and InsightBench. For each benchmark, the baseline and semantic
-conditions retain the same agent, model interface, native data tools, and
-evaluation procedure. The semantic condition adds one read-only MCP server
-and injects its manifest into the agent context.
+为 Data Agent 提供**自进化的语义层（Ontology Layer）**：在自然语言问题与数据库
+schema 之间加一层可版本化、可自我改进的语义映射，Agent 在会话中通过 MCP 工具查询它。
+本仓库是产品化核心包 = `evo/` 运行时 + `plugin/` 插件，外加三个 benchmark 的接入示例
+（`bird/`、`ddr/`、`insightbench/`）。
 
-## Method interface
+## 作用
 
-Each semantic MCP server exposes the same two operations:
+Data Agent（text-to-SQL / 数据分析 / 洞察生成）直接查库时，常因自然语言与 schema
+之间的 gap 而答错。本插件插入一层语义层，Agent 会话中用两个 MCP 工具查询：
 
-- `browse_semantics(query, kind, limit)` discovers relevant semantic records;
-- `resolve_semantics(mentions, context)` retrieves grounded mappings and
-  linked records for selected concepts.
+- `browse_semantics(query, kind, limit)` —— 发现与当前问题相关的概念；
+- `resolve_semantics(mentions, context)` —— 把选中概念解析为 grounding 的 Mapping，
+  并带回关联的 Relation / Constraint / Evidence。
 
-The server also publishes a benchmark-specific session-manifest resource. The
-agent reads its concise text when a semantic session starts. Semantic tools return
-metadata and guidance; database queries and Python execution remain the
-responsibility of the benchmark's native tools.
+服务同时暴露 `evo-semantic://session-manifest` 资源，Agent 在会话开始时读取简洁说明。
+语义层会自进化：`/evo-build` 构建初始 `semantic_v0`；`/evo-evolve` 依据历史任务轨迹走
+「诊断 → 归因 → 补丁 → Parent/Candidate gate → 发布新版本」，形成闭环。
 
-| Benchmark | Baseline execution | Native tool | Semantic MCP resource |
-| --- | --- | --- | --- |
-| BIRD | ReAct text-to-SQL agent | SQLite MCP server | `bird-semantic://session-manifest` |
-| DDR | Autonomous analysis agent | Scenario-specific SQLite/code MCP servers | `ddr-semantic://session-manifest` |
-| InsightBench | Iterative analysis/code-generation agent | Python execution tool | `insight-bench-semantic://session-manifest` |
+## 组成
 
-## Package layout
-
-Each benchmark directory includes its agent implementation, semantic runtime,
-MCP server, baseline and semantic configuration, startup entry point,
-evaluation entry point, and dependency specification.
-
-The `semantic_layer/versions/semantic_v0/` directory under each benchmark is
-an illustrative subset of the initial semantic layer. These examples follow
-the submitted schema and preserve valid cross-record references, but contain
-only a few representative Terms, Mappings, Relations, Constraints, and
-Evidence records. They are intended to demonstrate structure and server
-behavior rather than reproduce the full initialization used for all benchmark
-instances.
-
-The two manifest-related artifacts have distinct roles:
-
-- `version_metadata.json` records the immutable store version, schema label,
-  object counts, and example status; it is never inserted into an agent prompt.
-- the MCP `session-manifest` resource is generated at runtime as bounded plain
-  text containing only source/version information and tool-usage guidance.
-  Detailed ontology records remain accessible only through the two MCP tools.
-
-## Productized runtime (`evo` + `plugin`)
-
-The benchmark-independent product core is extracted into the `evo/` package — a
-four-file runtime (`models` / `store` / `runtime` / `mcp_server`) — and the
-`plugin/` directory, which packages the two trigger commands (`/evo-build`,
-`/evo-evolve`), their skills, and a validation gate. Build and evolve analysis
-lives in the skills; the Python package provides only the runtime.
-
-```bash
-python <path-to>/evo/mcp_server.py --store <workspace>    # MCP server (spawned by client via plugin/mcp.json)
-python plugin/scripts/validate.py --root <workspace>      # publish-time gate
+```
+evo/                       运行时四件套：models / store / runtime / mcp_server
+plugin/                    触发命令 + skills + validate 门禁 + mcp.json
+bird/ ddr/ insightbench/   三个 benchmark 的接入示例（含合法 workspace）
 ```
 
-The server is not started by hand in normal use — a Data Agent spawns it through
-`plugin/mcp.json`. `python -m evo.mcp_server --store <workspace>` is the
-equivalent manual form for local verification.
+## 安装
 
-See `USAGE.md` for a full walkthrough, and `evo/README.md` / `plugin/README.md`
-for component details.
+1. Python 3.10+；
+2. 安装 MCP 依赖：`python -m pip install "mcp>=1.0"`；
+3. 按需安装 benchmark 依赖：`python -m pip install -r <benchmark>/requirements.txt`。
 
-## Environment
+`evo` 包无需单独安装，在仓库根目录下直接运行即可。
 
-Python 3.10 or later is recommended. Install dependencies separately for each
-benchmark:
+## 执行
 
-```bash
-python -m pip install -r bird/requirements.txt
-python -m pip install -r ddr/requirements.txt
-python -m pip install -r insightbench/requirements.txt
-```
+### 1) 接入 Data Agent（MCP）
 
-Model credentials are read from the environment variables named in the
-example configuration files. Replace model placeholders and relative data
-paths with values appropriate to the local evaluation environment.
+编辑 `plugin/mcp.json` 填入两个占位符，MCP client 会自动拉起服务（无需手动起服）：
 
-Benchmark databases are not included because of submission size constraints.
-Place locally obtained benchmark data at the relative paths documented in the
-benchmark-specific README files.
+- `<path-to>`：本目录的绝对路径；
+- `<workspace-root>`：语义层 workspace 根目录（如 `ddr/semantic_layer`，建议绝对路径）。
 
-## Verification
-
-From this directory, the following command validates Python syntax:
+服务实际以脚本形式启动：
 
 ```bash
-python -m compileall -q bird ddr insightbench
+python <path-to>/evo/mcp_server.py --store <workspace-root>
 ```
 
-Detailed startup and evaluation commands are provided in the README file for
-each benchmark.
+本地验证可用等价模块形式 `python -m evo.mcp_server --store <workspace>`。
+
+### 2) 构建 / 进化
+
+- `/evo-build`：构建 `semantic_v0`（读数据 → 探索 schema → 生成 Term / Mapping /
+  Relation / Constraint / Evidence 五类记录 → 发布）；
+- `/evo-evolve`：触发一轮进化（诊断 → 归因 → 补丁 → Parent/Candidate 评估 → 接受或
+  拒绝；accept 后把候选发布为下一正式版本）。
+
+两者是 Claude Code / Codex 的触发指令，智能分析由对应 skill 完成，非确定性 Python
+操作。评估需在 `<workspace>/config.yaml` 里显式声明 `evaluation.mode`。
+
+### 3) 发布门禁
+
+每次发布前运行确定性校验（JSON 合法 / 引用完整 / 可加载）：
+
+```bash
+python plugin/scripts/validate.py --root <workspace-root>
+```
+
+## 文档
+
+`USAGE.md`（完整使用指南）· `ARCHITECTURE.md`（架构设计）· `evo/README.md`、
+`plugin/README.md`（组件说明）· `plugin/docs/`（版本命名 / 评估协议 / 轨迹格式）。
+
+## 环境与验证
+
+```bash
+python -m compileall -q evo plugin                          # 语法检查
+python plugin/scripts/validate.py --root ddr/semantic_layer # 门禁冒烟
+```
+
+模型凭据从环境变量读取；benchmark 数据需本地自备（见各 benchmark 目录的 README）。
