@@ -4,6 +4,29 @@
 之间加一层可版本化、可自我改进的语义映射。本仓库 = `plugin/` 插件（内含 `evo/` 运行时），
 外加 `benchmarks/` 下的三个 benchmark 接入示例。
 
+## 快速开始
+
+三步装好并跑起来：
+
+1. **安装插件**（插件根是 `plugin/` 子目录）：
+
+   ```bash
+   git clone git@github.com:Cmd210/EvoOntology_plugin.git
+   claude plugin install EvoOntology_plugin/plugin
+   ```
+
+   装完 `/evo-build`、`/evo-evolve` 两个命令与语义 MCP 自动就位。
+
+2. **接入语义 MCP**：把 `plugin/.mcp.json` 里的 `<workspace-root>` 换成你的语义层
+   workspace 绝对路径（含 `active.json` 的目录）。三个 benchmark 的 `semantic_layer/`
+   目录天然就是合法 workspace，可直接用；也可用 `/evo-build` 从零构建。
+
+3. **触发命令**：
+
+   - `/evo-build` —— 构建初始语义层 `semantic_v0`；
+   - `/evo-evolve` —— 触发一轮进化（诊断 → 归因 → 补丁 → Parent/Candidate 评估 → 发布
+     下一版本）。
+
 ## 作用
 
 Data Agent 直接查库时，常因自然语言与 schema 之间的 gap 而答错。本插件插入一层语义层，
@@ -15,6 +38,14 @@ Agent 在会话中用两个 MCP 工具查询：
 
 语义层会自进化：`/evo-build` 构建初始 `semantic_v0`；`/evo-evolve` 依据历史任务轨迹走
 「诊断 → 归因 → 补丁 → 评估 → 发布新版本」。
+
+## 发布门禁
+
+发布前运行确定性校验（JSON 合法 / 引用完整 / 可加载）：
+
+```bash
+python plugin/scripts/validate.py --root <workspace-root>
+```
 
 ## 三个 benchmark 接入示例
 
@@ -28,46 +59,9 @@ Agent 在会话中用两个 MCP 工具查询：
 | `benchmarks/ddr/` | DDR | 自主数据分析 |
 | `benchmarks/insightbench/` | InsightBench | 迭代分析 / 代码生成 |
 
-## 安装
-
-作为 Claude Code 插件安装（推荐）：
-
-```bash
-claude plugin install /path/to/EvoOntology_plugin/plugin
-```
-
-安装后 `/evo-build`、`/evo-evolve` 命令与语义 MCP 自动就位。运行 benchmark 另需
-Python 3.10+、`python -m pip install "mcp>=1.0"`、按需
+运行 benchmark 另需 Python 3.10+、`python -m pip install "mcp>=1.0"`、按需
 `python -m pip install -r benchmarks/<benchmark>/requirements.txt`。模型凭据从环境变量
 读取，benchmark 数据需本地自备（见各 benchmark 目录的 README）。
-
-## 使用
-
-### 接入 Data Agent（MCP）
-
-插件已通过 `plugin/.mcp.json` 声明语义服务，client 会在 Agent 运行时自动拉起、无需手动
-起服。安装后只需把 `<workspace-root>` 占位符换成你的 ontology workspace 绝对路径（含
-`active.json` 的目录，如 `benchmarks/ddr/semantic_layer`）；`${CLAUDE_PLUGIN_ROOT}` 由
-client 自动展开为插件根目录。
-
-### 构建 / 进化
-
-在 Claude Code / Codex 中输入：
-
-- `/evo-build` —— 构建初始语义层 `semantic_v0`；
-- `/evo-evolve` —— 触发一轮进化（诊断 → 归因 → 补丁 → Parent/Candidate 评估 → 发布
-  下一版本）。
-
-两者是触发指令，智能分析由对应 skill 完成。评估需在 `<workspace>/config.yaml` 里声明
-`evaluation.mode`。
-
-### 发布门禁
-
-发布前运行确定性校验（JSON 合法 / 引用完整 / 可加载）：
-
-```bash
-python plugin/scripts/validate.py --root <workspace-root>
-```
 
 ## 文档
 
