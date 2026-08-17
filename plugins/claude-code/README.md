@@ -27,10 +27,14 @@ pip install "git+https://github.com/Cmd210/EvoOntology_plugin.git"
 
 # 2. 从 GitHub Marketplace 安装本插件
 claude plugin marketplace add Cmd210/EvoOntology_plugin
+claude plugin marketplace list
 claude plugin install evoontology@evoontology
+claude plugin list
 ```
 
-装完 `/evo-build`、`/evo-evolve` 两个命令、两个 skill、语义 MCP 与进化提醒自动就位。
+无需 clone 仓库，也不强制创建虚拟环境。`marketplace list` 用于确认 Marketplace 已添加，
+`plugin install` 才会下载插件，`plugin list` 用于确认最终安装状态。安装完成后 build / evolve
+命令、两个 skill、语义 MCP 与进化提醒自动就位。
 
 ### 开发者 / Benchmark
 

@@ -19,7 +19,7 @@ Codex）**。两者分开安装，Plugin 统一调用已安装到 Python 环境�
 
 ### 普通用户
 
-无需 clone 仓库：
+无需 clone 仓库，也不强制创建虚拟环境；可直接安装到当前 Python 环境：
 
 ```bash
 # 1. 安装 EvoOntology Core（Python 包）
@@ -28,14 +28,18 @@ python -c "import evoontology; print(evoontology.__version__)"   # 验证：输�
 
 # 2. 从 GitHub Marketplace 安装 Claude Code 插件
 claude plugin marketplace add Cmd210/EvoOntology_plugin
+claude plugin marketplace list                         # 确认 evoontology marketplace 已添加
 claude plugin install evoontology@evoontology
+claude plugin list                                     # 确认 evoontology 插件已安装
 
 # 3. 进入你自己的项目，运行
 /evo-build
 ```
 
-装完 `/evo-build`、`/evo-evolve` 两个命令、builder / evolver 两个 skill、语义 MCP
-与 Session Start 进化提醒自动就位。Codex 用户改走 `plugins/evoontology-codex/`。
+`marketplace list` 只验证 Marketplace 来源，真正下载插件的是 `plugin install`；
+`plugin list` 用于验证最终安装结果。装完后 build / evolve 命令、builder / evolver 两个
+skill、语义 MCP 与 Session Start 进化提醒自动就位。Codex 用户改走
+`plugins/evoontology-codex/`。
 
 > marketplace 的 `source` 用 `git-subdir` 指向 `plugins/claude-code` 子目录，需较新版本
 > Claude Code；旧版本可能报 schema 校验错误。

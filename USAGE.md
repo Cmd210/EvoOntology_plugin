@@ -30,7 +30,9 @@ skill，Python 只做「运行时 + 最小确定性校验」。默认**零配置
 
   ```bash
   claude plugin marketplace add Cmd210/EvoOntology_plugin
+  claude plugin marketplace list
   claude plugin install evoontology@evoontology
+  claude plugin list
   ```
 
   装完 `/evo-build`、`/evo-evolve`、builder / evolver skill、语义 MCP 与 Session Start
@@ -130,7 +132,9 @@ validate 只做结构校验，不做数据库语义校验（表字段存在 / Ma
 # 0. 安装（普通用户）：
 #    pip install "git+https://github.com/Cmd210/EvoOntology_plugin.git"
 #    claude plugin marketplace add Cmd210/EvoOntology_plugin
+#    claude plugin marketplace list
 #    claude plugin install evoontology@evoontology
+#    claude plugin list
 
 # 1. 触发构建 semantic_v0（在 Claude Code 里输入）
 /evo-build
