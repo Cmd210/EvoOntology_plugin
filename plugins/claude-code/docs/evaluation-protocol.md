@@ -1,6 +1,7 @@
 # 评估协议
 
-EvoOntology 的评估按「是否有 ground truth」分两种协议（由 `evaluation.mode` 声明）。
+EvoOntology 的评估按「是否有 ground truth」分两种协议，由系统自动选择（benchmark 提供
+Evaluator/GT 时走 GT，否则走 LLM Judge），无需手动声明模式。
 两种场景都可能出现 LLM，但角色不同——**有 GT 的 LLM 是 benchmark 的判分器，无 GT 的 LLM
 才是 EvoOntology 的裁判**（本文「LLM Judge」专指后者）：
 
@@ -13,7 +14,7 @@ EvoOntology 的评估按「是否有 ground truth」分两种协议（由 `evalu
 | 需不需要 GT | 必须 | 不需要 |
 | 匿名 | 不需要 | 必须匿名 A/B |
 | 独立性 | 无（benchmark 的事） | 必须独立于 Evolver |
-| 谁提供 | benchmark 的评分函数，agent 在 Step 4 调用 | config.yaml 声明的 judge 模型，agent 按协议调用 |
+| 谁提供 | benchmark 的评分函数，agent 在 Step 4 调用 | 独立 judge 模型（告诉 agent 其 provider/model/api key，凭据走环境变量），agent 按协议调用 |
 
 **分界点按「是否有 GT」切，不按「是否用 LLM」切**：只要存在 GT 就走绝对评分，`score_fn`
 内部是精确匹配还是 LLM 判语义等价是 benchmark 的实现，EvoOntology 只拿分数；只有不存在 GT
@@ -26,9 +27,9 @@ EvoOntology 的评估按「是否有 ground truth」分两种协议（由 `evalu
 
 ## 无 GT —— 相对比较（LLM Judge）
 
-没有客观标尺、无法绝对打分，由 agent 在 Step 4 按协议调用 config.yaml 声明的独立 judge
-模型，匿名比较 Parent 与 Candidate 的答案 `judge_fn(question, answer_A,
-answer_B) -> verdict`。
+没有客观标尺、无法绝对打分，由 agent 在 Step 4 按协议调用独立 judge 模型（其
+provider/model/api key 直接告诉 agent，凭据走环境变量），匿名比较 Parent 与 Candidate 的
+答案 `judge_fn(question, answer_A, answer_B) -> verdict`。
 
 **输入**：每个验证任务给 judge `question + answer_A + answer_B`，A/B 随机标记，judge 不知
 哪个是 Parent、哪个是 Candidate。
