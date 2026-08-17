@@ -5,8 +5,9 @@ Checks ``<cwd>/.evoontology`` for an evolution-due condition and prints a
 one-line reminder to stdout. Claude Code injects hook stdout into the session
 context, so the agent sees the reminder without any user action.
 
-Silently exits when the workspace is not yet initialized (no ``state.json``)
-or when evolution is not due.
+Silently exits when no semantic layer is active or when evolution is not due.
+For backward compatibility, an active legacy workspace without ``state.json``
+is initialized automatically before checking its trajectories.
 """
 
 from __future__ import annotations
@@ -18,10 +19,12 @@ from evoontology import EvolutionTrigger
 
 def main() -> int:
     workspace = Path.cwd() / ".evoontology"
-    if not (workspace / "state.json").is_file():
+    if not (workspace / "active.json").is_file():
         return 0
 
-    result = EvolutionTrigger(str(workspace)).check()
+    trigger = EvolutionTrigger(str(workspace))
+    trigger.initialize()
+    result = trigger.check()
     if not result["evolution_due"]:
         return 0
 

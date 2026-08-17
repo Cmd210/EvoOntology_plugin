@@ -39,9 +39,10 @@ class EvolutionTrigger:
         if not self.state_path.is_file():
             return {}
         try:
-            return json.loads(self.state_path.read_text(encoding="utf-8"))
+            state = json.loads(self.state_path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             return {}
+        return state if isinstance(state, dict) else {}
 
     def _save_state(self, state: Dict[str, Any]) -> None:
         self.state_path.write_text(
@@ -59,6 +60,29 @@ class EvolutionTrigger:
             ),
             "min_days": int(thresholds.get("min_days", self._default_min_days)),
         }
+
+    def initialize(self, when: Optional[datetime] = None) -> Dict[str, Any]:
+        """Create the initial trigger state once and return the current state.
+
+        The operation is idempotent: an existing valid state is never reset.
+        No trajectory checkpoint is recorded here, so trajectories collected
+        before a legacy workspace is initialized still count toward the first
+        evolution reminder.
+        """
+        state = self._load_state()
+        if state.get("last_evolution_time"):
+            return state
+
+        checkpoint = when or datetime.now(timezone.utc)
+        state = {
+            "last_evolution_trajectory": state.get("last_evolution_trajectory"),
+            "last_evolution_time": checkpoint.isoformat(),
+            "evolution_due": False,
+            "thresholds": self._thresholds(),
+        }
+        self.root.mkdir(parents=True, exist_ok=True)
+        self._save_state(state)
+        return state
 
     # ---- check -------------------------------------------------------------
 

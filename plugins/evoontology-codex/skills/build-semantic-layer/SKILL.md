@@ -189,4 +189,14 @@ Create a versioned semantic layer containing:
 This version becomes the initial semantic layer and the starting point for
 future evolution.
 
+After the validated version is published, initialize its evolution trigger:
+
+```bash
+python -c "from evoontology import EvolutionTrigger; EvolutionTrigger(r'<workspace>').initialize()"
+```
+
+This operation is idempotent. It starts the time-based reminder from the
+initial publication without resetting existing trajectories or user-defined
+thresholds.
+
 **Stage Output:** A validated and versioned initial semantic layer.

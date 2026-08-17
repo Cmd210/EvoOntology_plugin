@@ -98,12 +98,20 @@ python -m evoontology.runtime.mcp_server
 
 ### 进化触发阈值
 
-满足任一即提示「该进化了」（Session Start 提醒，不自动进化）：
+EvoOntology 使用两类互补信号判断语义层是否值得复盘，满足任一条件便会在 Session Start
+给出非阻塞提醒：
 
-- 新增轨迹数 ≥ **10** 条（`min_new_trajectories`）；
-- 距上次进化 ≥ **7** 天（`min_days`）。
+- **工作量信号**：自初始语义层发布或上次成功进化后，新增 ≥ **10** 条 task trajectory
+  （`min_new_trajectories`）。一条 trajectory 对应 Data Agent 完成的一次任务，而不是数据库
+  记录数或工具调用次数；
+- **时间信号**：距初始语义层发布或上次成功进化 ≥ **7** 天（`min_days`），避免低频项目的
+  语义层长期缺少复盘。
 
-改法：告诉 Claude / Codex「以后每 20 条轨迹提醒我一次」，agent 会更新
+首次 `/evo-build` 会自动初始化计时状态；旧工作区若缺少状态，Session Start 钩子也会安全补建，
+且不会丢弃已经积累的 trajectory。提醒只提供决策信号，**不会自动执行进化**；成功完成
+`/evo-evolve` 后，系统会重置本轮 trajectory 计数起点和时间起点。
+
+阈值可以按项目节奏调整。例如告诉 Claude / Codex「以后每 20 个任务提醒我一次」，agent 会更新
 `<workspace>/.evoontology/state.json` 的 `thresholds` 字段。
 
 ### 评估协议（有 / 无 Ground Truth）

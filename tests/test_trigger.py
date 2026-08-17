@@ -1,4 +1,4 @@
-"""Trigger tests: task-count trigger, time trigger, and checkpoint reset."""
+"""Trigger tests: initialization, thresholds, and checkpoint reset."""
 
 from datetime import datetime, timedelta, timezone
 
@@ -24,6 +24,44 @@ def test_count_trigger(tmp_path):
     _seed(tmp_path, 3, datetime(2026, 8, 1, tzinfo=timezone.utc))
     trigger = EvolutionTrigger(str(tmp_path), min_new_trajectories=2, min_days=7)
     result = trigger.check()
+    assert result["evolution_due"] is True
+    assert result["new_trajectories"] == 3
+
+
+def test_initialize_creates_initial_state(tmp_path):
+    started_at = datetime(2026, 8, 1, tzinfo=timezone.utc)
+    trigger = EvolutionTrigger(str(tmp_path), min_new_trajectories=20, min_days=14)
+
+    state = trigger.initialize(when=started_at)
+
+    assert state == {
+        "last_evolution_trajectory": None,
+        "last_evolution_time": started_at.isoformat(),
+        "evolution_due": False,
+        "thresholds": {"min_new_trajectories": 20, "min_days": 14},
+    }
+    assert (tmp_path / "state.json").is_file()
+
+
+def test_initialize_is_idempotent(tmp_path):
+    first = datetime(2026, 8, 1, tzinfo=timezone.utc)
+    later = datetime(2026, 8, 20, tzinfo=timezone.utc)
+    trigger = EvolutionTrigger(str(tmp_path))
+
+    initial_state = trigger.initialize(when=first)
+    current_state = trigger.initialize(when=later)
+
+    assert current_state == initial_state
+    assert current_state["last_evolution_time"] == first.isoformat()
+
+
+def test_initialize_preserves_existing_trajectories_for_first_reminder(tmp_path):
+    _seed(tmp_path, 3, datetime(2026, 8, 1, tzinfo=timezone.utc))
+    trigger = EvolutionTrigger(str(tmp_path), min_new_trajectories=2, min_days=7)
+
+    trigger.initialize(when=datetime(2026, 8, 4, tzinfo=timezone.utc))
+    result = trigger.check(now=datetime(2026, 8, 4, tzinfo=timezone.utc))
+
     assert result["evolution_due"] is True
     assert result["new_trajectories"] == 3
 

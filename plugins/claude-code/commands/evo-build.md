@@ -26,3 +26,11 @@ Commitment，产出 Term / Mapping / Relation / Constraint / Evidence 五类记�
 
 发布前调用 `python -m evoontology.validate --root <workspace>` 做确定性门禁（引用完整性 +
 可加载）。
+
+发布成功后调用下面的幂等初始化命令，从 `semantic_v0` 发布时刻开始计算首次进化的时间阈值：
+
+```bash
+python -c "from evoontology import EvolutionTrigger; EvolutionTrigger(r'<workspace>').initialize()"
+```
+
+如果状态已经存在，该命令会原样保留，不会重置已累计的 trajectory 或阈值。

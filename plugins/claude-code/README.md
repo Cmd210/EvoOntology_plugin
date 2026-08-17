@@ -63,9 +63,16 @@ claude --plugin-dir plugins/claude-code  # 本地加载插件
 
 ### 进化提醒
 
-每次 Session Start，`check-reminder.py` 读取 `<cwd>/.evoontology/state.json` 与
-`trajectories/`，达到触发条件（默认 10 个新 task 或 7 天）时向会话注入提醒，用户自行决定
-是否执行 `/evo-evolve`。不自动启动进化。
+每次 Session Start，`check-reminder.py` 会用两类互补信号检查是否值得复盘语义层：
+
+- **工作量信号**：自初始发布或上次成功进化后，新增 ≥ 10 条 task trajectory；一条
+  trajectory 对应 Data Agent 完成的一次任务，不是数据库记录数或工具调用次数；
+- **时间信号**：距初始发布或上次成功进化 ≥ 7 天，照顾任务量较低但持续运行的项目。
+
+满足任一条件便向会话注入非阻塞提醒，由用户决定是否执行 `/evo-evolve`，插件不会自动启动
+进化。`/evo-build` 会初始化首次计时；旧工作区缺少 `state.json` 时，钩子会安全补建且保留
+已有 trajectory。成功进化后，计数与计时起点才会重置。阈值可在
+`<cwd>/.evoontology/state.json` 的 `thresholds` 中按项目节奏调整。
 
 ## 发布校验（agent 自动）
 

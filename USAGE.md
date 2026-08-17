@@ -79,7 +79,11 @@ Evidence。轨迹由 Data Agent 运行时（benchmark adapter 侧）在每次任
 产品默认零配置，无 `config.yaml`。用户需要调整时直接告诉 Claude / Codex（例如「以后每
 20 个任务提醒我一次」），由 agent 更新 `state.json` 内部状态，不改配置文件。
 
-- 进化触发默认：新增 ≥ 10 个 task，或距上次进化 ≥ 7 天。
+- 进化提醒采用“工作量 + 时间”双信号，满足任一条件即可：自初始发布或上次成功进化后
+  新增 ≥ 10 条 task trajectory，或已经过去 ≥ 7 天。trajectory 表示 Data Agent 完成的一次
+  任务，不是数据库记录数或工具调用次数。
+- `/evo-build` 发布成功后会自动初始化起点；旧工作区缺少状态时，Session Start 会安全补建，
+  并保留已累计的 trajectory。提醒不会自动启动进化；成功进化后才重置计数与计时起点。
 - 评估协议自动选择：benchmark 提供 Evaluator（Ground Truth）时走 GT；否则走 LLM Judge
   （见 `plugins/claude-code/docs/evaluation-protocol.md`）。
 
