@@ -2,7 +2,7 @@
 
 import pytest
 
-from evoontology import TrajectoryStore, truncate_result
+from evoontology import TrajectoryStore, from_message_trace, truncate_result
 
 
 def _traj(task_id, recorded_at, tool_calls=None):
@@ -56,6 +56,27 @@ def test_truncate_result_large():
     result = truncate_result("x\n" * 1000)
     assert result["result_truncated"] is True
     assert "result_summary" in result
+
+
+def test_from_message_trace_separates_semantic_and_native_calls():
+    trajectory = from_message_trace(
+        task_id="q1",
+        question="question",
+        ontology_version="semantic_v0",
+        messages=[
+            {"tool_call": {"tool": "browse_semantics", "arguments": {"query": "x"}}},
+            {"tool_result": {"items": []}},
+            {"tool_call": {"tool": "execute_query", "arguments": {"sql": "select 1"}}},
+            {"tool_result": {"rows": [[1]]}},
+            {"role": "agent", "content": "private reasoning must not be stored"},
+        ],
+        final_answer="select 1",
+    )
+
+    assert trajectory["semantic_calls"][0]["tool"] == "browse_semantics"
+    assert trajectory["native_tool_calls"][0]["tool"] == "execute_query"
+    assert trajectory["final_answer"] == "select 1"
+    assert "private reasoning" not in str(trajectory)
 
 
 def test_append_requires_task_id(tmp_path):

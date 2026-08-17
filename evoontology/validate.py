@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
-from evoontology.ontology.store import SemanticStore, VERSION_FILES
+from evoontology.ontology.store import VERSION_FILES, SemanticStore
 
 
 def validate(root: str) -> Dict[str, Any]:

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Implementation for the bird.tceo.loader module."""
 
-import json
 from pathlib import Path
 from typing import Dict
 
-from .models import Term, Mapping, Relation, Constraint, Evidence
+from evoontology import SemanticStore
+
+from .models import Constraint, Evidence, Mapping, Relation, Term
 
 
 class SemanticLayerLoader:
@@ -19,6 +20,7 @@ class SemanticLayerLoader:
         self.constraints: Dict[str, Constraint] = {}
         self.evidence: Dict[str, Evidence] = {}
         self.version: str = "unknown"
+        self._records: Dict[str, list] = {}
         self._loaded = False
 
     @classmethod
@@ -31,7 +33,7 @@ class SemanticLayerLoader:
         if not self.store_path.exists():
             raise FileNotFoundError(f"Semantic-layer directory does not exist: {self.store_path}")
 
-        self._select_active_version()
+        self.version, self._records = SemanticStore.load_records(str(self.store_path))
 
         self._load_terms()
         self._load_mappings()
@@ -41,33 +43,9 @@ class SemanticLayerLoader:
         self._load_manifest()
         self._loaded = True
 
-    def _select_active_version(self) -> None:
-        """Resolve a versioned store to its only bundled database directory."""
-        active_path = self.store_path / "active.json"
-        if not active_path.is_file():
-            return
-
-        active = json.loads(active_path.read_text(encoding="utf-8"))
-        version = str(active.get("version", "")).strip()
-        if not version:
-            raise ValueError(f"Missing version in semantic-layer index: {active_path}")
-
-        version_dir = self.store_path / "versions" / version
-        candidates = [path for path in version_dir.iterdir() if path.is_dir()]
-        if len(candidates) != 1:
-            raise ValueError(
-                "The BIRD supplementary store must contain exactly one "
-                f"database directory under {version_dir}"
-            )
-        self.store_path = candidates[0]
-        self.version = version
-
     def _read_json(self, filename: str) -> list:
-        filepath = self.store_path / filename
-        if not filepath.exists():
-            return []
-        with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
+        family = filename.removesuffix(".json")
+        return list(self._records.get(family, []))
 
     def _load_terms(self):
         for item in self._read_json("terms.json"):

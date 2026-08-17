@@ -51,8 +51,13 @@ python main.py run \
   --datadir data/notebooks \
   --model <model_name> \
   --semantic-layer \
-  --semantic-store semantic_layer
+  --semantic-store semantic_layer \
+  --record-trajectories
 ```
+
+Enable `--record-trajectories` only for construction/train workloads. Omit it
+for the held-out evaluation split so evaluation items cannot enter later
+evolution input.
 
 ## Semantic example
 

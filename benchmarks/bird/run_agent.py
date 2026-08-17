@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -18,7 +19,7 @@ if hasattr(sys.stderr, "reconfigure"):
 # Add project root
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from config import ExperimentConfig, SEMANTIC_LAYER_DIR
+from config import SEMANTIC_LAYER_DIR, ExperimentConfig
 
 
 async def main():
@@ -142,6 +143,19 @@ async def main():
                 print(f"\nExecution result: {json.dumps(result, ensure_ascii=False, default=str)[:300]}")
             except Exception as e:
                 print(f"\nExecution failed: {e}")
+
+        if config.semantic.enabled:
+            from evoontology import SemanticStore, TrajectoryStore, from_message_trace
+
+            store_path = config.semantic.store_path or str(SEMANTIC_LAYER_DIR / db_id)
+            TrajectoryStore(store_path).append(from_message_trace(
+                task_id=session.session_id,
+                question=args.question,
+                ontology_version=SemanticStore.active_version(store_path),
+                messages=agent.export_trace().get("messages", []),
+                final_answer=session.pred_sql,
+                task_status="completed",
+            ))
 
     finally:
         await mcp_client.close()

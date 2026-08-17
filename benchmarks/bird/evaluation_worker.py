@@ -16,11 +16,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from config import ExperimentConfig
-from run_evaluation import run_single_question, _make_entry
-from tool_server.mcp_client import MCPClientManager
 from agent.data_agent import BIRDReActAgent
+from config import ExperimentConfig
+from run_evaluation import _make_entry, run_single_question
 from tceo.runtime import BIRDSemanticLayer
+from tool_server.mcp_client import MCPClientManager
 
 
 def _write_result(result_path: str, entry: dict, trace: dict | None) -> None:
@@ -52,6 +52,7 @@ def main() -> None:
     question = job["question"]
     db_id = job["db_id"]
     save_traces = job.get("save_traces", False)
+    record_trajectories = job.get("record_trajectories", False)
 
     async def _run() -> tuple:
         result, trace = await run_single_question(
@@ -59,6 +60,7 @@ def main() -> None:
             MCPClientManager, BIRDReActAgent, BIRDSemanticLayer,
             verbose=False,
             save_traces=save_traces,
+            record_trajectories=record_trajectories,
             gold_lookup=None,
         )
         return _make_entry(result), trace

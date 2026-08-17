@@ -35,7 +35,7 @@ claude plugin install evoontology@evoontology
 ```
 
 装完 `/evo-build`、`/evo-evolve` 两个命令、builder / evolver 两个 skill、语义 MCP
-与 Session Start 进化提醒自动就位。Codex 用户改走 `plugins/codex/`（见其 README）。
+与 Session Start 进化提醒自动就位。Codex 用户改走 `plugins/evoontology-codex/`。
 
 > marketplace 的 `source` 用 `git-subdir` 指向 `plugins/claude-code` 子目录，需较新版本
 > Claude Code；旧版本可能报 schema 校验错误。
@@ -72,7 +72,7 @@ Data Agent 直接查库时，常因自然语言与 schema 之间的 gap 而答�
 | --- | --- |
 | `evoontology/` | 核心包：`ontology/`（五类记录 + 版本化 store）、`runtime/`（browse/resolve/MCP）、`trajectory/`（Tool Call 级轨迹）、`trigger/`（进化提醒）、`evaluation/`（GT / LLM Judge 调度）、`validate`（发布门禁） |
 | `plugins/claude-code/` | Claude Code 插件：`.mcp.json`（零配置语义 MCP）、`commands/`、`skills/`、`hooks/`（Session Start 提醒）、`scripts/`（check-reminder） |
-| `plugins/codex/` | Codex 适配层：`AGENTS.md`（全局指令）+ `mcp.json.example` |
+| `plugins/evoontology-codex/` | 自包含 Codex 插件：manifest + skills + MCP + 安装脚本 |
 | `benchmarks/` | 三个 benchmark 接入示例（各含 Data Agent / Native Tools / Runner / Evaluator） |
 | `tests/` | 核心路径测试（store / runtime / trajectory / trigger / evaluation） |
 
@@ -125,13 +125,14 @@ python -m evoontology.runtime.mcp_server
 | `benchmarks/ddr_10k/` | DDR-10K | 自主数据分析 |
 | `benchmarks/insightbench/` | InsightBench | 迭代分析 / 代码生成 |
 
-运行 benchmark 另需 Python 3.10+、`python -m pip install "mcp>=1.0"`、按需
+运行 benchmark 另需 Python 3.10+、`python -m pip install "mcp>=1.0,<2"`、按需
 `python -m pip install -r benchmarks/<benchmark>/requirements.txt`。模型凭据从环境变量
 读取，benchmark 数据需本地自备（见各 benchmark 目录的 README）。
 
 ## 测试
 
 ```bash
+python -m pip install -e ".[dev]"
 python -m pytest tests/
 ```
 

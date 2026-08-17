@@ -6,8 +6,8 @@ from typing import Any, Dict, List, Optional
 from insightbench.tceo.models import (
     ColumnProfile,
     Mapping,
-    Term,
     TaskInventory,
+    Term,
 )
 
 

@@ -4,7 +4,6 @@ import pytest
 
 from evoontology import EvaluationGate
 
-
 # ---- ground truth ----------------------------------------------------------
 
 def test_decide_gt_accept():

@@ -3,14 +3,12 @@
 import json
 import os
 import re
-import traceback
 from typing import Any, Dict, List, Optional
 
 import httpx
 from openai import OpenAI
 
 from insightbench.tceo.retriever import InsightSemanticLayer
-
 
 # ---------------------------------------------------------------------------
 
@@ -480,7 +478,7 @@ class ToolCallingChat:
                         status = r.get("status", "?")
                         print(f"    → {status}", flush=True)
                     except Exception:
-                        print(f"    → done", flush=True)
+                        print("    → done", flush=True)
 
 
             if native_calls:

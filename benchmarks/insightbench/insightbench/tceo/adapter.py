@@ -1,9 +1,8 @@
 """Implementation for the insightbench.insightbench.tceo.adapter module."""
 
 import re
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
-import numpy as np
 import pandas as pd
 from pandas.api.types import (
     is_bool_dtype,
@@ -12,7 +11,6 @@ from pandas.api.types import (
 )
 
 from insightbench.tceo.models import ColumnProfile, JoinCandidate, TaskInventory
-
 
 _TIME_NAME = re.compile(
     r"(^|_)(date|time|timestamp|datetime|year|month|day)(_|$)|(_at|_on|_date|_time|_timestamp)$|^(opened|closed|created|updated|start|started|end|ended)$",

@@ -14,6 +14,7 @@ from datetime import datetime
 from pathlib import Path
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -23,9 +24,8 @@ if hasattr(sys.stderr, "reconfigure"):
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from config import ExperimentConfig, DB_DIR, SEMANTIC_LAYER_DIR, RESULTS_DIR, get_dataset_config
 from agent.models import EvalResult
-
+from config import DB_DIR, RESULTS_DIR, SEMANTIC_LAYER_DIR, ExperimentConfig, get_dataset_config
 
 VES_EVAL_RUNS = 4
 
@@ -119,6 +119,7 @@ async def run_single_question(question_data: dict, config: ExperimentConfig,
                               mcp_client_class, agent_class, runtime_class,
                               verbose: bool = False,
                               save_traces: bool = False,
+                              record_trajectories: bool = False,
                               gold_lookup: dict | None = None) -> tuple:
     """Run single question."""
     from tool_server.mcp_client import MCPClientManager
@@ -206,8 +207,21 @@ async def run_single_question(question_data: dict, config: ExperimentConfig,
         pred_sql = session.pred_sql
         ex, ves = evaluate_sql(pred_sql, gold_sql, db_path)
 
-        if save_traces:
+        if save_traces or record_trajectories:
             trace = agent.export_trace()
+
+        if record_trajectories and config.semantic.enabled and trace:
+            from evoontology import SemanticStore, TrajectoryStore, from_message_trace
+
+            version = SemanticStore.active_version(semantic_store_path)
+            TrajectoryStore(semantic_store_path).append(from_message_trace(
+                task_id=f"{db_id}_{question_id}",
+                question=question,
+                ontology_version=version,
+                messages=trace.get("messages", []),
+                final_answer=pred_sql,
+                task_status="completed",
+            ))
 
         return (EvalResult(
             question_id=question_id, db_id=db_id, question=question,
@@ -218,9 +232,25 @@ async def run_single_question(question_data: dict, config: ExperimentConfig,
         ), trace)
 
     except Exception as e:
-        if save_traces:
+        if save_traces or record_trajectories:
             try:
                 trace = agent.export_trace()
+            except Exception:
+                pass
+        if record_trajectories and config.semantic.enabled and trace:
+            try:
+                from evoontology import SemanticStore, TrajectoryStore, from_message_trace
+
+                version = SemanticStore.active_version(semantic_store_path)
+                TrajectoryStore(semantic_store_path).append(from_message_trace(
+                    task_id=f"{db_id}_{question_id}",
+                    question=question,
+                    ontology_version=version,
+                    messages=trace.get("messages", []),
+                    final_answer="",
+                    task_status="failed",
+                    errors=[str(e)],
+                ))
             except Exception:
                 pass
         return (EvalResult(
@@ -404,6 +434,10 @@ async def main():
     parser.add_argument("--base-url", default="", help="API base URL")
     parser.add_argument("--verbose", action="store_true", help="Print detailed interactions")
     parser.add_argument("--save-traces", action="store_true", help="Save complete execution traces")
+    parser.add_argument(
+        "--record-trajectories", action="store_true",
+        help="Write normalized evolution trajectories to each semantic workspace",
+    )
     parser.add_argument("--parallel", type=int, default=None,
                         help="Number of parallel workers (default: 24)")
     parser.add_argument("--timeout", type=int, default=180, help="Per-question timeout in seconds (default: 180)")
@@ -446,13 +480,13 @@ async def main():
     print(f"Test files: {len(test_files)} items")
     print(f"Output: {args.output}")
     if args.verbose:
-        print(f"Verbose: ON")
+        print("Verbose: ON")
     if args.save_traces:
-        print(f"Save traces: ON")
+        print("Save traces: ON")
 
-    from tool_server.mcp_client import MCPClientManager
     from agent.data_agent import BIRDReActAgent
     from tceo.runtime import BIRDSemanticLayer
+    from tool_server.mcp_client import MCPClientManager
 
 
     gold_lookup: dict[str, str] = {}
@@ -480,7 +514,7 @@ async def main():
                     completed_ids.add(r["question_id"])
             print(f"Resume: {len(completed_ids)} questions already completed successfully; skipping")
         else:
-            print(f"[WARN] No all_results.json found in the resume directory; starting from scratch")
+            print("[WARN] No all_results.json found in the resume directory; starting from scratch")
     else:
         run_dir = (Path(args.output) / config.condition / timestamp).resolve()
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -537,6 +571,7 @@ async def main():
                                 MCPClientManager, BIRDReActAgent, BIRDSemanticLayer,
                                 verbose=args.verbose,
                                 save_traces=args.save_traces,
+                                record_trajectories=args.record_trajectories,
                                 gold_lookup=gold_lookup,
                             ),
                             timeout=args.timeout,
@@ -657,6 +692,7 @@ async def main():
                 "llm_kwargs": {k: v for k, v in llm_kwargs.items() if k != "api_key"},
                 "api_key_env": config.agent.api_key_env,
                 "save_traces": args.save_traces,
+                "record_trajectories": args.record_trajectories,
             }, ensure_ascii=False, indent=2), encoding="utf-8")
 
             payload = None
@@ -717,25 +753,25 @@ async def main():
 
     summary_file = run_dir / "summary.md"
     with open(summary_file, "w", encoding="utf-8") as f:
-        f.write(f"# BIRD Evaluation Summary\n\n")
+        f.write("# BIRD Evaluation Summary\n\n")
         f.write(f"- **Condition**: {config.condition}\n")
         f.write(f"- **Model**: {llm_kwargs['model']}\n")
         f.write(f"- **Date**: {timestamp}\n\n")
-        f.write(f"## Overall\n\n")
+        f.write("## Overall\n\n")
         f.write(f"- **EX**: {metrics['overall_ex']:.2%} "
                 f"({metrics['correct']}/{metrics['total']})\n")
         f.write(f"- **VES**: {metrics['overall_ves']:.4f}\n")
         f.write(f"- **Avg Turns**: {metrics['avg_turns']:.1f}\n\n")
-        f.write(f"## By Difficulty\n\n")
-        f.write(f"| Difficulty | EX | VES | Correct/Total |\n")
-        f.write(f"|------------|-----|------|---------------|\n")
+        f.write("## By Difficulty\n\n")
+        f.write("| Difficulty | EX | VES | Correct/Total |\n")
+        f.write("|------------|-----|------|---------------|\n")
         for diff, info in metrics["by_difficulty"].items():
             if info["total"] > 0:
                 f.write(f"| {diff} | {info['ex']:.2%} | {info['ves']:.4f} | "
                         f"{info['correct']}/{info['total']} |\n")
-        f.write(f"\n## By Database\n\n")
-        f.write(f"| Database | EX | VES | Correct/Total |\n")
-        f.write(f"|----------|-----|------|---------------|\n")
+        f.write("\n## By Database\n\n")
+        f.write("| Database | EX | VES | Correct/Total |\n")
+        f.write("|----------|-----|------|---------------|\n")
         for db, info in sorted(metrics["by_database"].items()):
             f.write(f"| {db} | {info['ex']:.2%} | {info['ves']:.4f} | "
                     f"{info['correct']}/{info['total']} |\n")
@@ -746,7 +782,7 @@ async def main():
           f"({metrics['correct']}/{metrics['total']})")
     print(f"Overall VES: {metrics['overall_ves']:.4f}")
     print(f"Output: {run_dir}")
-    print(f"  - summary.md | all_results.json")
+    print("  - summary.md | all_results.json")
     for db, info in sorted(metrics["by_database"].items()):
         if info["total"] > 0:
             print(f"  - {db}/results.json", end="")

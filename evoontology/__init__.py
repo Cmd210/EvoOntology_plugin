@@ -12,12 +12,12 @@ Build and Evolve intelligence lives in the plugin skills; this package provides
 only deterministic capabilities.
 """
 
+from .evaluation.evaluation import EvaluationGate
 from .ontology.models import Constraint, Evidence, Mapping, Relation, Term
 from .ontology.store import SemanticStore, ensure_workspace
 from .runtime.runtime import SemanticLayer
-from .trajectory.trajectory import TrajectoryStore, truncate_result
+from .trajectory.trajectory import TrajectoryStore, from_message_trace, truncate_result
 from .trigger.trigger import EvolutionTrigger
-from .evaluation.evaluation import EvaluationGate
 
 __version__ = "1.0.0"
 
@@ -29,6 +29,7 @@ __all__ = [
     "EvaluationGate",
     "ensure_workspace",
     "truncate_result",
+    "from_message_trace",
     "Term",
     "Mapping",
     "Relation",

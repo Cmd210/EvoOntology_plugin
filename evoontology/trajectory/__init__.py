@@ -1,5 +1,5 @@
 """Tool-call-level task trajectory recording."""
 
-from .trajectory import TrajectoryStore, now_iso, truncate_result
+from .trajectory import TrajectoryStore, from_message_trace, now_iso, truncate_result
 
-__all__ = ["TrajectoryStore", "now_iso", "truncate_result"]
+__all__ = ["TrajectoryStore", "from_message_trace", "now_iso", "truncate_result"]

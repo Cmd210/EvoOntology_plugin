@@ -12,7 +12,7 @@ from __future__ import annotations
 import json
 import shutil
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from .models import Constraint, Evidence, Mapping, Relation, Term
 
@@ -60,10 +60,24 @@ class SemanticStore:
     @classmethod
     def load(cls, path: str) -> "SemanticStore":
         """Load the semantic version selected by ``active.json`` under ``path``."""
-        version = cls.active_version(path)
-        store_dir = Path(path)
-        version_dir = store_dir / "versions" / version
+        version, records = cls.load_records(path)
+        loaded = {}
+        for family, (filename, model) in _FAMILIES.items():
+            loaded[family] = {
+                item["id"]: model.from_dict(item) for item in records[family]
+            }
+        return cls(version=version, root_dir=str(Path(path)), **loaded)
 
+    @classmethod
+    def load_records(cls, path: str) -> tuple[str, Dict[str, list]]:
+        """Load raw records for benchmark-specific thin adapters.
+
+        This is the canonical implementation of active-version selection and
+        required-file checking. Benchmark adapters may construct richer local
+        model objects without reimplementing the on-disk store contract.
+        """
+        version = cls.active_version(path)
+        version_dir = Path(path) / "versions" / version
         missing = [
             filename for filename, _ in _FAMILIES.values()
             if not (version_dir / filename).is_file()
@@ -72,12 +86,10 @@ class SemanticStore:
             raise FileNotFoundError(
                 f"Semantic version {version!r} is missing files: {missing}"
             )
-
-        loaded = {}
-        for family, (filename, model) in _FAMILIES.items():
-            records = _load_json(version_dir / filename)
-            loaded[family] = {item["id"]: model.from_dict(item) for item in records}
-        return cls(version=version, root_dir=str(store_dir), **loaded)
+        return version, {
+            family: _load_json(version_dir / filename)
+            for family, (filename, _) in _FAMILIES.items()
+        }
 
     @staticmethod
     def active_version(path: str) -> str:
@@ -185,4 +197,3 @@ def ensure_workspace(root: str) -> str:
     (root_dir / "versions").mkdir(parents=True, exist_ok=True)
     (root_dir / "trajectories").mkdir(parents=True, exist_ok=True)
     return str(root_dir)
-

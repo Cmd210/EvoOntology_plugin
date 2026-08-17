@@ -19,21 +19,22 @@ from typing import Any, Dict, List, Optional
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Import our modules
-from agent.models import MCPServerConfig, AgentMessage, AutonomousSession
-from tool_server.mcp_client import MCPClientManager
-from agent.ui_components import (
-    print_session_start, print_exploration_start, print_turn_header,
-    print_agent_turn, print_environment_turn, print_error, print_warning,
-    print_completion, print_log_info
-)
-from agent.prompt_manager import PromptManager
-
 # Import LLM providers
-from agent.llm_providers import (
-    LLMProvider,
-    create_llm_provider,
-    log_api_stats_summary
+from agent.llm_providers import LLMProvider, create_llm_provider, log_api_stats_summary
+from agent.models import AgentMessage, AutonomousSession, MCPServerConfig
+from agent.prompt_manager import PromptManager
+from agent.ui_components import (
+    print_agent_turn,
+    print_completion,
+    print_environment_turn,
+    print_error,
+    print_exploration_start,
+    print_log_info,
+    print_session_start,
+    print_turn_header,
+    print_warning,
 )
+from tool_server.mcp_client import MCPClientManager
 
 # Tool categories for insight generation control
 # Only evidence-gathering tools produce insights; navigation/semantic tools do not.
@@ -230,7 +231,7 @@ class AutonomousDataAgent:
             # Environment response (tool execution)
             # Only execute tool if agent_response is a valid tool call
             if isinstance(agent_response, dict) and "tool" in agent_response:
-                env_response = await self._environment_turn(agent_response)
+                await self._environment_turn(agent_response)
             else:
                 # This shouldn't happen, but just in case
                 print(f"Error: Unexpected agent_response format for tool execution: {agent_response}")
@@ -267,6 +268,21 @@ class AutonomousDataAgent:
                 for msg in self.session.messages if msg.role != "system"
             ]
         }
+
+        if self._semantic_layer is not None:
+            from evoontology import TrajectoryStore, from_message_trace
+
+            root_dir = getattr(self._semantic_layer.store, "root_dir", "")
+            if root_dir:
+                final_answer = self._get_latest_agent_message() or ""
+                TrajectoryStore(root_dir).append(from_message_trace(
+                    task_id=self.session.session_id,
+                    question=self.session.task,
+                    ontology_version=self._semantic_layer.version,
+                    messages=results["conversation"],
+                    final_answer=final_answer,
+                    task_status="completed",
+                ))
 
         print_completion(turn, "Session completed. Check logs for insights and statistics.")
 
@@ -550,7 +566,6 @@ class AutonomousDataAgent:
 
     def _prepare_llm_messages(self) -> List[Dict[str, Any]]:
         """Prepare messages for LLM call with tool call history support"""
-        from agent.llm_providers import LLMProvider
 
         # Detect provider type
         provider_name = self.llm_provider.get_provider_name().lower()
@@ -978,7 +993,7 @@ async def main():
 
     # Add parent directory to path to allow importing config
     sys.path.append(str(Path(__file__).parent.parent))
-    from config import get_config, Config
+    from config import Config, get_config
 
     parser = argparse.ArgumentParser(description="Autonomous Data Analysis Agent")
     parser.add_argument("--llm-provider",
@@ -1147,10 +1162,10 @@ async def main():
 
     try:
         # Start autonomous session
-        session = await agent.start_autonomous_session(args.task)
+        await agent.start_autonomous_session(args.task)
 
         # Run autonomous exploration
-        results = await agent.run_autonomous_exploration(max_turns=max_turns)
+        await agent.run_autonomous_exploration(max_turns=max_turns)
 
         # Print completion summary
         print(f"Exploration completed in {len([m for m in agent.session.messages if m.role == 'agent'])} turns")

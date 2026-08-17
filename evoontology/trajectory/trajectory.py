@@ -48,6 +48,56 @@ def truncate_result(result: Any) -> Dict[str, Any]:
     }
 
 
+def from_message_trace(
+    *,
+    task_id: str,
+    question: str,
+    ontology_version: str,
+    messages: List[Dict[str, Any]],
+    final_answer: Any = "",
+    task_status: str = "completed",
+    errors: Optional[List[Any]] = None,
+) -> Dict[str, Any]:
+    """Normalize a benchmark message trace to the trajectory schema.
+
+    Agent prose and chain-of-thought are intentionally not persisted. Only
+    observable tool inputs/results and the final answer are retained.
+    """
+    semantic_calls: List[Dict[str, Any]] = []
+    native_tool_calls: List[Dict[str, Any]] = []
+    pending_call: Optional[Dict[str, Any]] = None
+
+    for message in messages or []:
+        tool_call = message.get("tool_call")
+        if isinstance(tool_call, dict) and tool_call.get("tool"):
+            pending_call = {
+                "tool": str(tool_call["tool"]),
+                "input": tool_call.get("arguments", {}),
+            }
+        if message.get("tool_result") is None or pending_call is None:
+            continue
+        result = message.get("tool_result")
+        call = dict(pending_call)
+        if call["tool"] in {"browse_semantics", "resolve_semantics"}:
+            call["result"] = result
+            semantic_calls.append(call)
+        else:
+            call.update(truncate_result(result))
+            native_tool_calls.append(call)
+        pending_call = None
+
+    return {
+        "task_id": str(task_id),
+        "question": str(question),
+        "ontology_version": str(ontology_version),
+        "semantic_calls": semantic_calls,
+        "native_tool_calls": native_tool_calls,
+        "final_answer": final_answer,
+        "task_status": str(task_status),
+        "errors": list(errors or []),
+    }
+
+
 class TrajectoryStore:
     """Append and query task trajectories under ``<workspace>/trajectories/``."""
 
@@ -58,14 +108,15 @@ class TrajectoryStore:
     def append(self, trajectory: Dict[str, Any], recorded_at: Optional[str] = None) -> str:
         """Persist one task trajectory to ``trajectories/<task_id>.json``.
 
-        Returns the ``task_id``. ``recorded_at`` defaults to the current UTC
-        time; pass it explicitly for deterministic tests.
+        Returns the ``task_id``. An explicit ``recorded_at`` overrides a value
+        already present in the trajectory; otherwise the current UTC time is
+        used.
         """
         if "task_id" not in trajectory:
             raise ValueError("trajectory requires a 'task_id'")
         task_id = str(trajectory["task_id"])
         record = dict(trajectory)
-        record["recorded_at"] = recorded_at or now_iso()
+        record["recorded_at"] = recorded_at or record.get("recorded_at") or now_iso()
         self._write(task_id, record)
         return task_id
 

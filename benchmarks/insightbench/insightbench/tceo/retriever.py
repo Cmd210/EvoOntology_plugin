@@ -8,9 +8,9 @@ from typing import Any, Dict, List, Optional
 import pandas as pd
 
 from insightbench.tceo.adapter import InsightAdapter
-from insightbench.tceo.binder import DeterministicBinder, TaskBinding, _safe_id
-from insightbench.tceo.session_manifest import build_session_manifest
+from insightbench.tceo.binder import DeterministicBinder, TaskBinding
 from insightbench.tceo.models import TaskInventory
+from insightbench.tceo.session_manifest import build_session_manifest
 from insightbench.tceo.store import VersionedSemanticStore
 
 

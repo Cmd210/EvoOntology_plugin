@@ -36,7 +36,7 @@ skill，Python 只做「运行时 + 最小确定性校验」。默认**零配置
   装完 `/evo-build`、`/evo-evolve`、builder / evolver skill、语义 MCP 与 Session Start
   进化提醒自动就位。
 
-- 开发者 / Benchmark：clone 仓库后 `pip install -e .`（只装 Core，含 `mcp>=1.0`），
+- 开发者 / Benchmark：clone 仓库后 `pip install -e .`（只装 Core，含 `mcp>=1.0,<2`），
   本地加载插件用 `claude --plugin-dir plugins/claude-code`。
 
 ---

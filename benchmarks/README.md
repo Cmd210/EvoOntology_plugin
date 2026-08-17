@@ -18,9 +18,10 @@ Build → Use → Record → Evolve → Evaluate 闭环。
 | Evaluation 调度 | `evoontology.evaluation.EvaluationGate` | `decide_gt` / `decide_judge` |
 
 每个 benchmark 目录下的 Data Agent、Native Tools、Runner、Evaluator 与数据划分为该
-benchmark 特有实现，语义数据存放在各自 workspace（`<benchmark>/.evoontology`）。历史实现中
-的本地 `tceo/` 与 `tool_server/semantic_mcp.py` 为论文复现用的 adapter，新接入应直接复用
-`evoontology` 包；两者加载同一套五类记录 schema。
+benchmark 特有实现。`tceo/` 中保留 benchmark 特有的 Binder、scope 和 manifest adapter，
+但 active-version 选择与五类 JSON 文件门禁统一调用 `SemanticStore.load_records()`；轨迹统一
+写入 Core 的 `TrajectoryStore`。BIRD 使用每数据库一个 workspace：
+`bird/semantic_layer/<db_id>/`，DDR 与 InsightBench 各使用一个 `semantic_layer/` workspace。
 
 ## 数据准备
 

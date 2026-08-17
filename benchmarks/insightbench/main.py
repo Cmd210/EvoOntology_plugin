@@ -8,9 +8,7 @@ from datetime import datetime
 from pathlib import Path
 
 from dotenv import load_dotenv
-
 from insightbench import runner as runner_mod
-
 
 load_dotenv()
 os.environ.setdefault("MPLBACKEND", "Agg")
@@ -78,6 +76,7 @@ def cmd_run(args: argparse.Namespace) -> None:
         "semantic_enabled": args.semantic_layer,
         "semantic_store_path": args.semantic_store,
         "semantic_max_tool_rounds": args.semantic_max_tool_rounds,
+        "record_trajectories": args.record_trajectories,
         "base_url": args.agent_base_url
         or args.base_url
         or os.getenv("OPENAI_BASE_URL"),
@@ -128,6 +127,10 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--semantic-layer", action="store_true")
     run.add_argument("--semantic-store", default=None)
     run.add_argument("--semantic-max-tool-rounds", type=int, default=12)
+    run.add_argument(
+        "--record-trajectories", action="store_true",
+        help="Write normalized trajectories to the semantic workspace",
+    )
     run.add_argument("--base-url", default=None)
     run.add_argument("--agent-api-key", default=None)
     run.add_argument("--agent-base-url", default=None)

@@ -1,11 +1,10 @@
 """Load an immutable, versioned InsightBench semantic store."""
 
-import json
 from pathlib import Path
 from typing import Dict, Optional
 
+from evoontology import SemanticStore
 from insightbench.tceo.models import Constraint, Evidence, Mapping, Relation, Term
-
 
 _DEFAULT_STORE_DIR = Path(__file__).resolve().parents[2] / "semantic_layer"
 DEFAULT_STORE_PATH = str(_DEFAULT_STORE_DIR)
@@ -64,36 +63,16 @@ class VersionedSemanticStore:
     def load(cls, path: Optional[str] = None) -> "VersionedSemanticStore":
         """Load the immutable version selected by ``active.json``."""
         store_dir = Path(path) if path else _DEFAULT_STORE_DIR
-        active_file = store_dir / "active.json"
-        if not active_file.is_file():
-            raise FileNotFoundError(f"Missing semantic-layer index: {active_file}")
-
-        active = _load_json(active_file)
-        version = active.get("version", "")
-        if not version:
-            raise ValueError(f"Missing version in {active_file}")
-
-        version_dir = store_dir / "versions" / version
+        version, raw_records = SemanticStore.load_records(str(store_dir))
         required = {
-            "terms": ("terms.json", Term),
-            "relations": ("relations.json", Relation),
-            "mappings": ("mappings.json", Mapping),
-            "constraints": ("constraints.json", Constraint),
-            "evidence": ("evidence.json", Evidence),
+            "terms": Term,
+            "relations": Relation,
+            "mappings": Mapping,
+            "constraints": Constraint,
+            "evidence": Evidence,
         }
-        missing = [name for name, _ in required.values() if not (version_dir / name).is_file()]
-        if missing:
-            raise FileNotFoundError(
-                f"Semantic version {version!r} is missing files: {missing}"
-            )
-
-        loaded = {}
-        for family, (filename, model) in required.items():
-            records = _load_json(version_dir / filename)
-            loaded[family] = {item["id"]: model.from_dict(item) for item in records}
+        loaded = {
+            family: {item["id"]: model.from_dict(item) for item in raw_records[family]}
+            for family, model in required.items()
+        }
         return cls(version=version, **loaded)
-
-
-def _load_json(path: Path):
-    with path.open("r", encoding="utf-8") as stream:
-        return json.load(stream)

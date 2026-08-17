@@ -42,6 +42,9 @@ scenario block added. The optional
 `--target-ids`, `--entity-file`, `--parallel`, and `--log-dir` arguments
 support restricted or distributed runs without changing the agent.
 
+Semantic runs automatically append normalized task trajectories to
+`semantic_layer/trajectories/`; agent prose/chain-of-thought is not stored.
+
 ## Evaluation
 
 ```bash

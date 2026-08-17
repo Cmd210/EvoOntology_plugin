@@ -251,6 +251,40 @@ class BatchRunner:
 
         save_json(flag_result_path, result.to_dict())
 
+        if (
+            self.agent_config.get("record_trajectories")
+            and self.agent_config.get("semantic_enabled")
+            and semantic_trace is not None
+        ):
+            from evoontology import TrajectoryStore
+
+            store_path = self.agent_config.get("semantic_store_path")
+            if store_path:
+                semantic_calls = [
+                    {
+                        "tool": event.get("type", ""),
+                        "input": event.get("arguments", {}),
+                        "result": {
+                            "result_ids": event.get("result_ids", []),
+                            "status": event.get("status", ""),
+                        },
+                    }
+                    for event in semantic_trace.get("semantic_events", [])
+                ]
+                TrajectoryStore(store_path).append({
+                    "task_id": f"flag_{flag_id}",
+                    "question": goal,
+                    "ontology_version": semantic_trace.get("semantic_version", "unknown"),
+                    "semantic_calls": semantic_calls,
+                    "native_tool_calls": [],
+                    "final_answer": {
+                        "insights": result.pred_insights or [],
+                        "summary": result.pred_summary or "",
+                    },
+                    "task_status": "completed" if result.generation_success else "failed",
+                    "errors": [result.error] if result.error else [],
+                })
+
         return result
 
     def _evaluate_only(self, flag_id: int, cached: dict, result_path: str) -> FlagResult:
