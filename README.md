@@ -14,9 +14,13 @@ tests/         核心路径测试
 
 ## 快速开始
 
+在仓库根目录执行。`pip install -e .` 里的 `.` 指向当前目录，pip 读取该目录的
+`pyproject.toml`（其中 `name = "evoontology"`），所以安装的就是 EvoOntology 核心包。
+
 ```bash
-# 1. 安装核心包（本目录，即 evoontology 根目录）
+# 1. 安装核心包 evoontology（读取当前目录 pyproject.toml）
 pip install -e .
+python -c "import evoontology; print(evoontology.__version__)"   # 验证：输出 1.0.0
 
 # 2. 安装 Claude Code 插件（插件根是 plugins/claude-code/）
 claude plugin install plugins/claude-code
@@ -57,6 +61,33 @@ python -m evoontology.runtime.mcp_server
 ```
 
 如需指向别的 workspace，追加 `--store <workspace-root>`。
+
+## 默认设置（可调整）
+
+产品默认零配置，以下参数有内置默认值，需要时可让 agent 调整（或直接改 workspace 的
+`state.json`）。
+
+### 进化触发阈值
+
+满足任一即提示「该进化了」（Session Start 提醒，不自动进化）：
+
+- 新增轨迹数 ≥ **10** 条（`min_new_trajectories`）；
+- 距上次进化 ≥ **7** 天（`min_days`）。
+
+改法：告诉 Claude / Codex「以后每 20 条轨迹提醒我一次」，agent 会更新
+`<workspace>/.evoontology/state.json` 的 `thresholds` 字段。
+
+### 评估协议（有 / 无 Ground Truth）
+
+系统自动选择，无需手动声明模式：
+
+- **有 GT**：benchmark 提供 `score_fn(answer, gt)` 绝对评分，Candidate 平均分严格高于
+  Parent 才 accept；
+- **无 GT**：走 LLM Judge——匿名 A/B 比较 Parent 与 Candidate，Candidate 零硬伤且胜出
+  任务严格多于 Parent 才 accept（门槛见 `plugins/claude-code/docs/evaluation-protocol.md`）。
+
+无 GT 时需指定一个**独立于 Evolver 的 judge 模型**（provider / model / api key，凭据用
+环境变量），直接告诉 agent 即可。
 
 ## 三个 benchmark 接入示例
 
