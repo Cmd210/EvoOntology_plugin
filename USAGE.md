@@ -12,7 +12,7 @@
 skill，Python 只做「运行时 + 最小确定性校验」。默认**零配置**：不要求用户填写 workspace
 路径、Evaluation Mode、Judge 模型或 Trigger 参数。
 
-本文所有命令均在 `supplementary_materials/` 目录下执行。
+本文所有命令均在仓库根目录执行。
 
 ---
 
@@ -121,7 +121,6 @@ validate 只做结构校验，不做数据库语义校验（表字段存在 / Ma
 ## 7. 一个最小端到端流程
 
 ```bash
-cd supplementary_materials
 pip install -e .
 claude plugin install plugins/claude-code
 
@@ -142,4 +141,4 @@ agent 发布前会自动调用 `scripts/validate.py` 做门禁。
 
 Web UI / SaaS / 多租户 / 消息队列 / 常驻 worker / 多 Candidate 并行 / 自动循环 / 高频改
 schema 均不在本版范围。无人值守全自动进化需要常驻后台 worker，一期只做「检测 + 提醒」，
-由人触发。详见 `EvoOntology 产品化开发设计方案（精简版）.md` 第 16/18 节。
+由人触发。

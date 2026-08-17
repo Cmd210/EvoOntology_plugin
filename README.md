@@ -81,5 +81,5 @@ python -m pytest tests/
 
 ## 文档
 
-`USAGE.md`（完整使用指南）· `ARCHITECTURE.md`（架构设计）· `plugins/claude-code/README.md`
-（插件组件）· `plugins/claude-code/docs/`（版本命名 / 评估协议 / 轨迹格式）。
+`USAGE.md`（完整使用指南）· `plugins/claude-code/README.md`（插件组件）·
+`plugins/claude-code/docs/`（版本命名 / 评估协议 / 轨迹格式）。
