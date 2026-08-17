@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "evoontology"
+version = "1.0.0"
+description = "EvoOntology core: versioned semantic-layer store, runtime/MCP, trajectory recording, evolution trigger, and evaluation gate."
+requires-python = ">=3.10"
+dependencies = ["mcp>=1.0"]
+
+[tool.setuptools.packages.find]
+include = ["evoontology", "evoontology.*"]

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "evo-semantic": {
+      "command": "python",
+      "args": ["-m", "evoontology.runtime.mcp_server"]
+    }
+  }
+}

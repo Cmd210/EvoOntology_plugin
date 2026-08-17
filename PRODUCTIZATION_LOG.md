@@ -135,3 +135,78 @@ trajectory、evaluate），把这些本应由 skill 智能分析承担的部分�
 5. `plugin/scripts/validate.py --root ddr/semantic_layer` → passed: true；
    `--root insightbench/semantic_layer` → passed: true。
 6. `git status` 复核改动只落在 `evo/`、`plugin/`、根文档与散目录存档。
+
+---
+
+## 重组记录（restructure）—— 依据 `EvoOntology 产品化开发设计方案（精简版）.md`
+
+在「精简（slim）」基础上，按精简版设计方案把目录与运行时对齐为最终产品形态：核心包
+`evoontology/`（拆分子模块）、双 harness 插件 `plugins/`、统一 workspace `.evoontology/`、
+零配置。
+
+### 最终目录（对齐方案 §3）
+
+```
+supplementary_materials/
+├── evoontology/           核心包（确定性能力）
+│   ├── ontology/          models.py（5 类记录）+ store.py（版本化 store / candidate / rollback）
+│   ├── runtime/           runtime.py（browse/resolve/manifest）+ mcp_server.py（2 工具 + manifest 资源）
+│   ├── trajectory/        TrajectoryStore（Tool Call 级轨迹）+ truncate_result
+│   ├── trigger/           EvolutionTrigger（task 数量 + 时间触发 + checkpoint）
+│   └── evaluation/        EvaluationGate（GT / LLM Judge 聚合 gate + anonymize/decode）
+├── plugins/
+│   ├── claude-code/       .mcp.json（零配置 MCP）+ commands/ + skills/ + hooks/ + scripts/ + docs/
+│   └── codex/             AGENTS.md + mcp.json.example
+├── benchmarks/            bird / ddr_10k / insightbench + README（统一核心接入）
+├── tests/                 test_store / test_runtime / test_trajectory / test_trigger / test_evaluation
+├── pyproject.toml         package name = evoontology
+└── README.md / USAGE.md
+```
+
+### 主要变更
+
+| 项 | 之前（slim） | 之后（restructure） |
+| --- | --- | --- |
+| 包名 | `evo/`（四件套平铺） | `evoontology/`（按 ontology/runtime/trajectory/trigger/evaluation 拆分子模块） |
+| 插件目录 | `plugin/`（单插件） | `plugins/claude-code/` + `plugins/codex/`（双 harness） |
+| 语义 MCP | `python ${CLAUDE_PLUGIN_ROOT}/evo/mcp_server.py --store <root>` | `python -m evoontology.runtime.mcp_server`（零配置，默认 `.evoontology/`） |
+| workspace 默认 | 各 benchmark `semantic_layer/` | 项目根 `.evoontology/`（active.json + versions/ + trajectories/ + state.json） |
+| 配置 | `config.yaml` + `config.template.yaml`（用户复制填写） | 删除，零配置；阈值/Eval Mode 由 agent 改 state.json / 自动选择 |
+| active.json 字段 | `{"version": ...}` | `{"active_version": ...}`（保留 `version` 旧字段回退） |
+| 触发 | 阈值可配（config.yaml） | `EvolutionTrigger(root, min_new_trajectories=10, min_days=7)` + state.json checkpoint |
+| benchmark 目录 | `ddr/` | `ddr_10k/`（git mv） |
+| 评估 gate | 写进 docs（无确定性代码） | `EvaluationGate`（decide_gt / decide_judge / anonymize / decode 确定性实现） |
+
+### 设计决策
+
+1. **`active_version` 字段 + 旧 `version` 回退**：方案 §4 规定 `active.json` 用
+   `active_version`，但历史 `semantic_layer/active.json` 用 `version`；`SemanticStore.active_version`
+   读 `active_version or version`，保证既能服务 `.evoontology` 新 workspace，也能继续加载
+   benchmark 的旧 `semantic_layer/`。
+2. **零配置 MCP**：`.mcp.json` 的 args 只写 `["-m", "evoontology.runtime.mcp_server"]`，
+   `mcp_server.py` 的 `--store` 默认 `cwd/.evoontology`；用户无需填写 workspace 路径。
+3. **触发模块 `mark_evolved` 支持注入时间**：`check(now=...)` 已可注入，`mark_evolved(when=...)`
+   同样注入 checkpoint 时间戳，使「时间触发」路径可确定性测试（否则用真实系统时间，19 天
+   间隔无法稳定复现）。
+4. **评估 gate 的 hard-reject**：`decide_judge` 用 `accept = (critical_error==0) and
+   (candidate_wins > parent_wins)`，对齐方案 §13 的保守门槛（任一 critical_error 即拒）。
+5. **benchmark 语义模型保留 adapter 角色**：`bird/ddr_10k/insightbench` 各自的 `tceo/` 与
+   `tool_server/semantic_mcp.py` 为论文复现 adapter（含 binder/enrich、kind 枚举等），与
+   `evoontology` 简化五类记录模型不同；新接入统一复用 `evoontology`，不强行 break 现有
+   benchmark 代码（见 `benchmarks/README.md`）。
+
+### 测试（方案 §17 路径）
+
+`tests/` 五个文件覆盖：store（save/load/active/candidate/rollback/legacy）、runtime
+（browse/resolve/manifest/未初始化）、trajectory（Tool Call 顺序与字段/truncate）、trigger
+（task 数量/时间/checkpoint reset）、evaluation（GT accept/reject、judge 聚合 + critical_error
+hard-reject、anonymize、decode）。
+
+```bash
+python -m pytest tests/
+# → 38 passed
+```
+
+> 本机 Windows 环境 `TEMP`（`D:\Temp`）对 pytest 的 `tmp_path` fixture 有权限拒绝
+> （`PermissionError: [WinError 5]`），临时用 `--basetemp=.pytest_tmp` 绕过；属环境问题，
+> 非代码问题。正常环境直接 `python -m pytest tests/` 即可。

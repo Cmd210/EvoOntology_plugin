@@ -5,11 +5,10 @@ description: 构建 semantic_v0——读数据、探索 schema、生成 5 类记
 ## 输入上下文
 
 本命令是触发指令，不是确定性操作；build 的实际执行者是按 skill 行动的 agent。agent 需要
-三处输入，均来自当前 benchmark 上下文（由调用者提供），不写入 `config.yaml`（那是持久部署
-配置，不是任务级上下文）：
+三处输入，均来自当前项目上下文（由调用者提供）：
 
-- **工作区根目录 `<workspace>`**：默认取当前 benchmark 的 `semantic_layer/`；调用者可
-  用 `--root <workspace>` 覆盖，指向别的 ontology workspace（如产品 `.evoontology/`）。
+- **工作区根目录 `<workspace>`**：默认取当前项目的 `.evoontology/`（首次运行自动创建）；
+  调用者可用 `--root <workspace>` 覆盖，指向别的 ontology workspace。
 - **数据环境**：当前已挂载的只读数据工具（SQLite MCP / Python 执行等）+ benchmark 配置里
   声明的数据源路径。Builder 只读这些数据，不改数据本身。
 - **工作量（workload）**：benchmark 数据集的构建划分（construction split）问题。按

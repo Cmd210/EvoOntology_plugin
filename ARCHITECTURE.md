@@ -1,5 +1,12 @@
 # EvoOntology 架构设计
 
+> **已归档（历史）**：本文档记录「slim」阶段的架构（`evo/` 四件套 + `plugin/` + `config.yaml`）。
+> 当前最终架构见 `EvoOntology 产品化开发设计方案（精简版）.md`（权威）与根 `README.md`；
+> 核心差异：包名 `evo` → `evoontology`（拆分子模块）、`plugin/` → `plugins/claude-code/` +
+> `plugins/codex/`、删除 `config.yaml`（零配置）、workspace 默认 `.evoontology/`、
+> `active.json` 字段 `active_version`。下文保留原分析，其中的 `evo/`、`plugin/`、`config.yaml`
+> 等均指历史形态。
+
 ## 1. 背景与结论
 
 产品化后的 `evo` 包包含大量机械层（六命令 CLI、workspace、replay、trajectory、evaluate）。

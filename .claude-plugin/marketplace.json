@@ -1,0 +1,11 @@
+{
+  "name": "evoontology-local",
+  "owner": { "name": "Eric Chong" },
+  "plugins": [
+    {
+      "name": "evoontology",
+      "source": "./plugins/claude-code",
+      "description": "Self-evolving ontology layer for data agents: /evo-build and /evo-evolve."
+    }
+  ]
+}

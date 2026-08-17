@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional
 
-from .store import SemanticStore
+from ..ontology.store import SemanticStore
 
 _ACTIVE_STATES = {"validated", "active"}
 _DEFAULT_TOOLS = ["browse_semantics", "resolve_semantics"]
@@ -34,7 +34,23 @@ class SemanticLayer:
 
     @classmethod
     def load(cls, store_path: str) -> "SemanticLayer":
-        return cls(SemanticStore.load(store_path))
+        try:
+            store = SemanticStore.load(store_path)
+        except FileNotFoundError:
+            store = cls._empty_store()
+        return cls(store)
+
+    @staticmethod
+    def _empty_store() -> SemanticStore:
+        return SemanticStore(
+            version="uninitialized",
+            terms={},
+            relations={},
+            mappings={},
+            constraints={},
+            evidence={},
+            root_dir="",
+        )
 
     @property
     def version(self) -> str:
@@ -43,6 +59,12 @@ class SemanticLayer:
     # ---- manifest ----------------------------------------------------------
 
     def manifest(self, exposed_tools: Optional[List[str]] = None) -> str:
+        if self.store.version == "uninitialized":
+            return (
+                "Semantic layer: uninitialized.\n\n"
+                "No ontology has been built for this workspace yet. Run "
+                "/evo-build to create the initial semantic version."
+            )
         counts = self.store.counts()
         active_constraints = [
             c for c in self.store.constraints.values() if _is_active(c)

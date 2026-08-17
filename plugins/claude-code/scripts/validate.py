@@ -11,13 +11,10 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-
-from evo.store import SemanticStore, VERSION_FILES  # noqa: E402
+from evoontology.ontology.store import SemanticStore, VERSION_FILES
 
 
 def validate(root: str) -> Dict[str, Any]:
@@ -30,7 +27,7 @@ def validate(root: str) -> Dict[str, Any]:
 
     try:
         active = json.loads(active_file.read_text(encoding="utf-8"))
-        version = str(active.get("version", "")).strip()
+        version = str(active.get("active_version") or active.get("version") or "").strip()
     except json.JSONDecodeError as exc:
         return {"passed": False, "root": str(root), "errors": [f"Invalid active.json: {exc}"]}
 

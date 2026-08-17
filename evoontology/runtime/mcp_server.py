@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -22,10 +23,8 @@ from mcp.server.models import InitializationOptions
 if __package__:
     from .runtime import SemanticLayer
 else:
-    import sys
-
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from evo.runtime import SemanticLayer
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from evoontology.runtime.runtime import SemanticLayer
 
 _RESOURCE_URI = "evo-semantic://session-manifest"
 
@@ -138,9 +137,14 @@ class SemanticMCPServer:
 
 async def main() -> None:
     parser = argparse.ArgumentParser(description="EvoOntology semantic MCP server")
-    parser.add_argument("--store", required=True, help="Workspace root containing active.json")
+    parser.add_argument(
+        "--store",
+        default=None,
+        help="Workspace root containing active.json (default: <cwd>/.evoontology)",
+    )
     args = parser.parse_args()
-    await SemanticMCPServer(args.store).run()
+    store = args.store or str(Path.cwd() / ".evoontology")
+    await SemanticMCPServer(store).run()
 
 
 if __name__ == "__main__":
