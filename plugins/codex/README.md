@@ -14,13 +14,25 @@ Builder / Evolver skill，这里只放 Codex harness 所需的适配：全局指
 
 ## 安装
 
+### 普通用户
+
 ```bash
-# 1. 安装核心包
-pip install -e .
+# 1. 安装 EvoOntology Core
+pip install "git+https://github.com/Cmd210/EvoOntology_plugin.git"
 
 # 2. 把 AGENTS.md 接入 Codex（任选其一）
+#    —— 通过 Codex marketplace（仓库根的 .agents/plugins/marketplace.json）自动发现，
+#       或手动复制 AGENTS.md：
 cp plugins/codex/AGENTS.md ~/.codex/AGENTS.md          # 全局
 # 或放入项目根作为项目级 AGENTS.md
+```
+
+### 开发者 / Benchmark
+
+```bash
+git clone https://github.com/Cmd210/EvoOntology_plugin.git
+cd EvoOntology_plugin
+pip install -e .    # 只装 Core
 ```
 
 ## 接入语义 MCP

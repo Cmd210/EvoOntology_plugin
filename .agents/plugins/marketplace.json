@@ -1,0 +1,10 @@
+{
+  "name": "evoontology",
+  "interface": { "displayName": "EvoOntology" },
+  "plugins": [
+    {
+      "name": "evoontology-codex",
+      "source": { "source": "git-subdir", "url": "https://github.com/Cmd210/EvoOntology_plugin.git", "path": "plugins/codex", "ref": "main" }
+    }
+  ]
+}

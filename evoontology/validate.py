@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Deterministic validation of a versioned ontology workspace.
 
 Checks that the active version exists, its five record files are valid JSON,

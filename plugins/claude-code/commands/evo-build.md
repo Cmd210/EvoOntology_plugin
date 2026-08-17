@@ -24,5 +24,5 @@ description: 构建 semantic_v0——读数据、探索 schema、生成 5 类记
 Commitment，产出 Term / Mapping / Relation / Constraint / Evidence 五类记录，发布为
 `semantic_v0`。
 
-发布前调用 `scripts/validate.py --root <workspace>` 做确定性门禁（引用完整性 +
+发布前调用 `python -m evoontology.validate --root <workspace>` 做确定性门禁（引用完整性 +
 可加载）。

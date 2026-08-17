@@ -13,22 +13,33 @@ builder / evolver 两个 skill、语义 MCP 运行时，以及 Session Start 进
 | Evolver skill | `skills/evolve-semantic-layer/` | 诊断 → 归因 → 补丁 → gate |
 | MCP 配置 | `.mcp.json` | 语义 MCP server 自动接入（零配置） |
 | 进化提醒 | `hooks/hooks.json` + `scripts/check-reminder.py` | Session Start 检查 evolution_due |
-| 校验门禁 | `scripts/validate.py` | 引用完整性 + 可加载 |
 
 语义 MCP 与确定性能力（store / runtime / trajectory / trigger / evaluation）统一由
 仓库根的 `evoontology/` 包提供，本插件不重复维护运行时。
 
 ## 安装
 
-```bash
-# 1. 安装核心包（evoontology 根目录）
-pip install -e .
+### 普通用户
 
-# 2. 安装插件（本目录即插件根，清单在 .claude-plugin/plugin.json）
-claude plugin install plugins/claude-code
+```bash
+# 1. 安装 EvoOntology Core
+pip install "git+https://github.com/Cmd210/EvoOntology_plugin.git"
+
+# 2. 从 GitHub Marketplace 安装本插件
+claude plugin marketplace add Cmd210/EvoOntology_plugin
+claude plugin install evoontology@evoontology
 ```
 
 装完 `/evo-build`、`/evo-evolve` 两个命令、两个 skill、语义 MCP 与进化提醒自动就位。
+
+### 开发者 / Benchmark
+
+```bash
+git clone https://github.com/Cmd210/EvoOntology_plugin.git
+cd EvoOntology_plugin
+pip install -e .                        # 只装 Core
+claude --plugin-dir plugins/claude-code  # 本地加载插件
+```
 
 ## 使用
 
@@ -54,11 +65,11 @@ claude plugin install plugins/claude-code
 
 ## 发布校验（agent 自动）
 
-`/evo-build`、`/evo-evolve` 发布新版本前，agent 会自动调用 `scripts/validate.py` 做确定性
+`/evo-build`、`/evo-evolve` 发布新版本前，agent 会自动调用 `python -m evoontology.validate` 做确定性
 门禁（JSON 合法 / 引用完整 / 可加载），用户无需手动执行。仅手动诊断 workspace 时才直接运行：
 
 ```bash
-python plugins/claude-code/scripts/validate.py --root <workspace-root>
+python -m evoontology.validate --root <workspace-root>
 ```
 
 只做结构校验，不做数据库语义校验。

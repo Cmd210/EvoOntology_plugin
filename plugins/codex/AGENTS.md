@@ -11,7 +11,7 @@ skills under `plugins/claude-code/skills/`.
   execute the `build-semantic-layer` skill (see
   `plugins/claude-code/skills/build-semantic-layer/SKILL.md`). Default workspace
   is `<project-root>/.evoontology` (create it on first run). Publish `semantic_v0`
-  after running `python plugins/claude-code/scripts/validate.py --root <workspace>`.
+  after running `python -m evoontology.validate --root <workspace>`.
 - **Evolve** — when the user asks to "evolve the ontology" or runs `/evo-evolve`,
   execute the `evolve-semantic-layer` skill (see
   `plugins/claude-code/skills/evolve-semantic-layer/SKILL.md`) following

@@ -4,11 +4,11 @@
 通用能力抽取为一个**核心包** `evoontology/`（确定性能力），并配两套 harness 适配：
 
 - `evoontology/` —— 与 benchmark 无关的产品运行时：ontology store / runtime(MCP) /
-  trajectory / trigger / evaluation。
-- `plugins/` —— Claude Code 插件（两命令 + 两 skill + MCP + reminder + validate 门禁）
+  trajectory / trigger / evaluation / validate 门禁。
+- `plugins/` —— Claude Code 插件（两命令 + 两 skill + MCP + reminder）
   与 Codex 适配层。
 
-产品最终形态 = 一个核心包 + 一个 validate 脚本 + 两个 skill 命令，无 CLI。智能分析全在
+产品最终形态 = 一个核心包（含 validate 门禁）+ 两个 skill 命令，无 CLI。智能分析全在
 skill，Python 只做「运行时 + 最小确定性校验」。默认**零配置**：不要求用户填写 workspace
 路径、Evaluation Mode、Judge 模型或 Trigger 参数。
 
@@ -18,20 +18,26 @@ skill，Python 只做「运行时 + 最小确定性校验」。默认**零配置
 
 ## 1. 前置条件
 
-- Python 3.10+，安装核心包与 MCP 依赖：
+- Python 3.10+。
+
+- 安装 EvoOntology Core（普通用户无需 clone 仓库）：
 
   ```bash
-  pip install -e .          # 安装 evoontology 核心包（含 mcp>=1.0）
+  pip install "git+https://github.com/Cmd210/EvoOntology_plugin.git"
   ```
 
-- 安装 Claude Code 插件（插件根是 `plugins/claude-code/`）：
+- 从 GitHub Marketplace 安装 Claude Code 插件：
 
   ```bash
-  claude plugin install plugins/claude-code
+  claude plugin marketplace add Cmd210/EvoOntology_plugin
+  claude plugin install evoontology@evoontology
   ```
 
   装完 `/evo-build`、`/evo-evolve`、builder / evolver skill、语义 MCP 与 Session Start
   进化提醒自动就位。
+
+- 开发者 / Benchmark：clone 仓库后 `pip install -e .`（只装 Core，含 `mcp>=1.0`），
+  本地加载插件用 `claude --plugin-dir plugins/claude-code`。
 
 ---
 
@@ -105,11 +111,11 @@ python -m evoontology.runtime.mcp_server --store <workspace-root>
 
 ## 6. validate 门禁（agent 自动）
 
-`/evo-build`、`/evo-evolve` 发布新版本前，agent 会自动调用 `scripts/validate.py` 做确定性
+`/evo-build`、`/evo-evolve` 发布新版本前，agent 会自动调用 `python -m evoontology.validate` 做确定性
 门禁（JSON 合法 / 引用完整 / 可加载），用户无需手动执行。仅手动诊断 workspace 时才直接运行：
 
 ```bash
-python plugins/claude-code/scripts/validate.py --root <workspace-root>
+python -m evoontology.validate --root <workspace-root>
 # → {"passed": true, "root": "...", "version": "semantic_v0", "errors": []}
 ```
 
@@ -121,8 +127,10 @@ validate 只做结构校验，不做数据库语义校验（表字段存在 / Ma
 ## 7. 一个最小端到端流程
 
 ```bash
-pip install -e .
-claude plugin install plugins/claude-code
+# 0. 安装（普通用户）：
+#    pip install "git+https://github.com/Cmd210/EvoOntology_plugin.git"
+#    claude plugin marketplace add Cmd210/EvoOntology_plugin
+#    claude plugin install evoontology@evoontology
 
 # 1. 触发构建 semantic_v0（在 Claude Code 里输入）
 /evo-build
@@ -133,7 +141,7 @@ claude plugin install plugins/claude-code
 /evo-evolve        # agent 诊断→补丁→gate；accept 后 agent 自行发布（改 active.json）
 ```
 
-agent 发布前会自动调用 `scripts/validate.py` 做门禁。
+agent 发布前会自动调用 `python -m evoontology.validate` 做门禁。
 
 ---
 

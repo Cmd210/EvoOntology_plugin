@@ -12,22 +12,47 @@ benchmarks/    三个 benchmark 接入示例（bird / ddr_10k / insightbench）
 tests/         核心路径测试
 ```
 
-## 快速开始
+## 安装
 
-在仓库根目录执行。`pip install -e .` 里的 `.` 指向当前目录，pip 读取该目录的
-`pyproject.toml`（其中 `name = "evoontology"`），所以安装的就是 EvoOntology 核心包。
+EvoOntology 由两部分组成：**Core（Python 包 `evoontology`）** 与 **Plugin（Claude Code /
+Codex）**。两者分开安装，Plugin 统一调用已安装到 Python 环境里的 `evoontology` 包。
+
+### 普通用户
+
+无需 clone 仓库：
 
 ```bash
-# 1. 安装核心包 evoontology（读取当前目录 pyproject.toml）
-pip install -e .
+# 1. 安装 EvoOntology Core（Python 包）
+pip install "git+https://github.com/Cmd210/EvoOntology_plugin.git"
 python -c "import evoontology; print(evoontology.__version__)"   # 验证：输出 1.0.0
 
-# 2. 安装 Claude Code 插件（插件根是 plugins/claude-code/）
-claude plugin install plugins/claude-code
+# 2. 从 GitHub Marketplace 安装 Claude Code 插件
+claude plugin marketplace add Cmd210/EvoOntology_plugin
+claude plugin install evoontology@evoontology
+
+# 3. 进入你自己的项目，运行
+/evo-build
 ```
 
 装完 `/evo-build`、`/evo-evolve` 两个命令、builder / evolver 两个 skill、语义 MCP
 与 Session Start 进化提醒自动就位。Codex 用户改走 `plugins/codex/`（见其 README）。
+
+> marketplace 的 `source` 用 `git-subdir` 指向 `plugins/claude-code` 子目录，需较新版本
+> Claude Code；旧版本可能报 schema 校验错误。
+
+### 开发者 / Benchmark
+
+```bash
+git clone https://github.com/Cmd210/EvoOntology_plugin.git
+cd EvoOntology_plugin
+pip install -e .            # 只安装 Core；Plugin 需另行加载
+
+# 本地加载 Claude Code 插件（无需 marketplace）
+claude --plugin-dir plugins/claude-code
+```
+
+`pip install -e .` 里的 `.` 指向仓库根，pip 读取该目录的 `pyproject.toml`（其中
+`name = "evoontology"`），所以只安装 EvoOntology Python Core，**不负责安装 Plugin**。
 
 ## 作用
 
@@ -45,8 +70,8 @@ Data Agent 直接查库时，常因自然语言与 schema 之间的 gap 而答�
 
 | 目录 | 内容 |
 | --- | --- |
-| `evoontology/` | 核心包：`ontology/`（五类记录 + 版本化 store）、`runtime/`（browse/resolve/MCP）、`trajectory/`（Tool Call 级轨迹）、`trigger/`（进化提醒）、`evaluation/`（GT / LLM Judge 调度） |
-| `plugins/claude-code/` | Claude Code 插件：`.mcp.json`（零配置语义 MCP）、`commands/`、`skills/`、`hooks/`（Session Start 提醒）、`scripts/`（validate 门禁 + check-reminder） |
+| `evoontology/` | 核心包：`ontology/`（五类记录 + 版本化 store）、`runtime/`（browse/resolve/MCP）、`trajectory/`（Tool Call 级轨迹）、`trigger/`（进化提醒）、`evaluation/`（GT / LLM Judge 调度）、`validate`（发布门禁） |
+| `plugins/claude-code/` | Claude Code 插件：`.mcp.json`（零配置语义 MCP）、`commands/`、`skills/`、`hooks/`（Session Start 提醒）、`scripts/`（check-reminder） |
 | `plugins/codex/` | Codex 适配层：`AGENTS.md`（全局指令）+ `mcp.json.example` |
 | `benchmarks/` | 三个 benchmark 接入示例（各含 Data Agent / Native Tools / Runner / Evaluator） |
 | `tests/` | 核心路径测试（store / runtime / trajectory / trigger / evaluation） |
